@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/dpapathanasiou/go-recaptcha"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
@@ -24,6 +25,14 @@ var (
 )
 
 func init() {
+	fmt.Println("PopCat Echo")
+	fmt.Println("===")
+	fmt.Println("The server reproduce implementation of https://popcat.click.")
+	fmt.Println("License: MIT LICENSE")
+	fmt.Println("Repository: https://github.com/supersonictw/popcat-echo")
+	fmt.Println("(c) 2021 SuperSonic. https://github.com/supersonictw")
+	fmt.Println()
+
 	DB, err := sql.Open("mysql", config.Get(config.MysqlDSN))
 	if err != nil {
 		panic(err)
