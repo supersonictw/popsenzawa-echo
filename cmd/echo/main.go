@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/supersonictw/popcat-echo/internal"
 	"github.com/supersonictw/popcat-echo/internal/leaderboard"
 	"github.com/supersonictw/popcat-echo/internal/pop"
 	"log"
@@ -14,7 +15,7 @@ func main() {
 	r.POST("/pop", pop.Response)
 	r.POST("/leaderboard", leaderboard.Response)
 
-	err := r.Run()
+	err := r.Run(internal.PublishAddress)
 	if err != nil {
 		log.Fatal(err)
 	}

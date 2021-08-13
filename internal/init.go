@@ -15,6 +15,7 @@ import (
 )
 
 var (
+	PublishAddress    string
 	DB                *sql.DB
 	RDB               *redis.Client
 	RefreshInterval   int64
@@ -32,6 +33,8 @@ func init() {
 	fmt.Println("Repository: https://github.com/supersonictw/popcat-echo")
 	fmt.Println("(c) 2021 SuperSonic. https://github.com/supersonictw")
 	fmt.Println()
+
+	PublishAddress = config.Get(config.PublishAddress)
 
 	DB, err := sql.Open("mysql", config.Get(config.MysqlDSN))
 	if err != nil {
