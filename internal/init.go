@@ -28,7 +28,7 @@ var (
 func init() {
 	fmt.Println("PopCat Echo")
 	fmt.Println("===")
-	fmt.Println("The server reproduce improvement of https://popcat.click.")
+	fmt.Println("The server reproduce of https://popcat.click with improvement.")
 	fmt.Println("License: MIT LICENSE")
 	fmt.Println("Repository: https://github.com/supersonictw/popcat-echo")
 	fmt.Println("(c) 2021 SuperSonic. https://github.com/supersonictw")
