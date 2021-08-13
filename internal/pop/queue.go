@@ -21,8 +21,8 @@ func Queue() {
 			continue
 		}
 		allResource := internal.RDB.LRange(ctx, key, 0, length).Val()
-		var regionPops map[string]*Pop
-		var addressPops map[string]*Pop
+		regionPops := make(map[string]*Pop)
+		addressPops := make(map[string]*Pop)
 		for _, value := range allResource {
 			pop := new(Pop)
 			err := json.Unmarshal([]byte(value), pop)

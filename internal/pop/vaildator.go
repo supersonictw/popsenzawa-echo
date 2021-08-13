@@ -94,14 +94,16 @@ func queryRegionCodeFromAPI(ipAddress string) string {
 	if err != nil {
 		panic(err)
 	}
-	var result map[string]interface{}
+	result := make(map[string]interface{})
 	resultBytes, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(resultBytes, &result)
 	if err != nil {
 		panic(err)
 	}
-	if country, ok := result["country"].(map[string]interface{}); ok {
-		return country["iso_code"].(string)
+	if data, ok := result["data"].(map[string]interface{}); ok {
+		if country, ok := data["country"].(map[string]interface{}); ok {
+			return country["iso_code"].(string)
+		}
 	}
 	return ""
 }
