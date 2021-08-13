@@ -3,6 +3,7 @@ package config
 const (
 	PublishAddress    = "PUBLISH_ADDRESS"
 	RefreshInterval   = "REFRESH_INTERVAL"
+	RefreshDelay      = "REFRESH_DELAY"
 	RedisHostname     = "REDIS_HOST"
 	RedisPassword     = "REDIS_PASS"
 	RedisDatabase     = "REDIS_DBNAME"

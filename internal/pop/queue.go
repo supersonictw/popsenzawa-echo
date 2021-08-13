@@ -12,7 +12,7 @@ import (
 func Queue() {
 	ctx := context.Background()
 	for {
-		stepTimestamp := getCurrentStepTimestamp()
+		stepTimestamp := getCurrentStepTimestamp() - internal.RefreshInterval*internal.RefreshDelay
 		key := fmt.Sprintf("%s:%d", internal.CacheNamespacePop, stepTimestamp)
 		length := internal.RDB.LLen(ctx, key).Val()
 		if length == 0 {
