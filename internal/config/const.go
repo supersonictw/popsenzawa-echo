@@ -1,6 +1,7 @@
 package config
 
 const (
+	RefreshInterval   = "REFRESH_INTERVAL"
 	RedisHostname     = "REDIS_HOST"
 	RedisPassword     = "REDIS_PASS"
 	RedisDatabase     = "REDIS_DBNAME"

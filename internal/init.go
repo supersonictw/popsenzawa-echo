@@ -16,6 +16,7 @@ import (
 var (
 	DB                *sql.DB
 	RDB               *redis.Client
+	RefreshInterval   int64
 	CacheNamespacePop string
 	CacheNamespaceGeo string
 	ReCaptchaStatus   bool
@@ -41,6 +42,11 @@ func init() {
 		DB:       redisDatabase,
 	})
 
+	refreshIntervalInt, err := strconv.Atoi(os.Getenv(config.RefreshInterval))
+	if err != nil {
+		panic(err)
+	}
+	RefreshInterval = int64(refreshIntervalInt)
 	CacheNamespacePop = os.Getenv(config.RedisNamespacePop)
 	CacheNamespaceGeo = os.Getenv(config.RedisNamespaceGeo)
 

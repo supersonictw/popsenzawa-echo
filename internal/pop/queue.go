@@ -87,5 +87,5 @@ func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
 
 func getCurrentStepTimestamp() int64 {
 	timestamp := time.Now().Unix()
-	return timestamp / 100 * 100
+	return timestamp / internal.RefreshInterval * internal.RefreshInterval
 }
