@@ -1,0 +1,3 @@
+package pop
+
+func Queue() {}
