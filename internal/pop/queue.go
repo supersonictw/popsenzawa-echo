@@ -15,7 +15,7 @@ func Queue() {
 	ctx := context.Background()
 	for {
 		stepTimestamp := getCurrentStepTimestamp()
-		key := fmt.Sprintf("%s:%d", "", stepTimestamp)
+		key := fmt.Sprintf("%s:%d", internal.CacheNamespacePop, stepTimestamp)
 		length := internal.RDB.LLen(ctx, key).Val()
 		if length == 0 {
 			continue
@@ -49,6 +49,7 @@ func Queue() {
 		for _, value := range addressPops {
 			go updateAddressPop(sg, value)
 		}
+		internal.RDB.Del(ctx, key)
 		sg.Wait()
 		if getCurrentStepTimestamp() == stepTimestamp {
 			time.Sleep(time.Second)
