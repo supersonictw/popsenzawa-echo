@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	"github.com/dpapathanasiou/go-recaptcha"
 	"github.com/go-redis/redis/v8"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"log"
-	"os"
 	"strconv"
 	"time"
 )
@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-	DB, err := sql.Open("mysql", os.Getenv(config.MysqlDSN))
+	DB, err := sql.Open("mysql", config.Get(config.MysqlDSN))
 	if err != nil {
 		panic(err)
 	}
@@ -32,32 +32,32 @@ func init() {
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(10)
 
-	redisDatabase, err := strconv.Atoi(os.Getenv(config.RedisDatabase))
+	redisDatabase, err := strconv.Atoi(config.Get(config.RedisDatabase))
 	if err != nil {
 		log.Fatal(err)
 	}
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv(config.RedisHostname),
-		Password: os.Getenv(config.RedisPassword),
+		Addr:     config.Get(config.RedisHostname),
+		Password: config.Get(config.RedisPassword),
 		DB:       redisDatabase,
 	})
 
-	refreshIntervalInt, err := strconv.Atoi(os.Getenv(config.RefreshInterval))
+	refreshIntervalInt, err := strconv.Atoi(config.Get(config.RefreshInterval))
 	if err != nil {
 		panic(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
-	CacheNamespacePop = os.Getenv(config.RedisNamespacePop)
-	CacheNamespaceGeo = os.Getenv(config.RedisNamespaceGeo)
+	CacheNamespacePop = config.Get(config.RedisNamespacePop)
+	CacheNamespaceGeo = config.Get(config.RedisNamespaceGeo)
 
-	if secret := os.Getenv(config.ReCaptchaSecret); secret != "" {
+	if secret := config.Get(config.ReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)
 		ReCaptchaStatus = true
 	} else {
 		ReCaptchaStatus = false
 	}
 
-	if secret := os.Getenv(config.JWTSecret); secret != "" {
+	if secret := config.Get(config.JWTSecret); secret != "" {
 		JWTCaptchaSecret = secret
 	} else {
 		JWTCaptchaSecret = uuid.NewString()

@@ -7,8 +7,6 @@ import (
 	"github.com/supersonictw/popcat-echo/internal"
 	"sync"
 	"time"
-
-	_ "github.com/go-sql-driver/mysql"
 )
 
 func Queue() {
