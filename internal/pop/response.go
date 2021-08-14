@@ -73,6 +73,19 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
+	if count == 0 {
+		newToken, err := IssueJWT(c, ctx)
+		if err == nil {
+			c.JSON(http.StatusOK, gin.H{
+				"new_token": newToken,
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+		}
+		return
+	}
 
 	regionCode, err := GetRegionCode(ctx, ipAddress)
 	if err != nil {
