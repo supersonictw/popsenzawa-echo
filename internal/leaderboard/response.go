@@ -1,6 +1,7 @@
 package leaderboard
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/r3labs/sse/v2"
@@ -9,20 +10,27 @@ import (
 
 func Response(c *gin.Context) {
 	server := sse.New()
+	ctx, cancel := context.WithCancel(context.Background())
 	server.CreateStream("messages")
-	go listen(server)
+	go listen(ctx, server)
 	server.HTTPHandler(c.Writer, c.Request)
+	cancel()
 }
 
-func listen(server *sse.Server) {
+func listen(ctx context.Context, server *sse.Server) {
 	for {
 		jsonBytes, err := json.Marshal(fetchRegionPops())
 		if err != nil {
 			panic(err)
 		}
-		server.Publish("messages", &sse.Event{
-			Data: jsonBytes,
-		})
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			server.Publish("messages", &sse.Event{
+				Data: jsonBytes,
+			})
+		}
 		time.Sleep(time.Second)
 	}
 }
