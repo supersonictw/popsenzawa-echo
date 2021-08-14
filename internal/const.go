@@ -13,6 +13,7 @@ const (
 	ConfigReCaptchaSecret   = "RECAPTCHA_SECRET"
 	ConfigJWTSecret         = "JWT_SECRET"
 	ConfigJWTExpired        = "JWT_EXPIRED"
+	ConfigPopLimit          = "POP_LIMIT"
 	ErrorInvalidCount       = "invalid count"
 	ErrorInvalidCountRange  = "invalid count range"
 	ErrorEmptyCaptchaToken  = "empty captcha token"

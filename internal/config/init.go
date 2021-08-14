@@ -58,7 +58,7 @@ func init() {
 	}
 	JWTExpired = time.Duration(jwtExpired)
 
-	PopLimit, err = strconv.Atoi(Get(internal.ConfigRefreshDelay))
+	PopLimit, err = strconv.Atoi(Get(internal.ConfigPopLimit))
 	if err != nil {
 		panic(err)
 	}
