@@ -13,6 +13,10 @@ const (
 	ConfigReCaptchaSecret   = "RECAPTCHA_SECRET"
 	ConfigJWTSecret         = "JWT_SECRET"
 	ConfigJWTExpired        = "JWT_EXPIRED"
+	ErrorInvalidCount       = "invalid count"
+	ErrorInvalidCountRange  = "invalid count range"
+	ErrorEmptyCaptchaToken  = "empty captcha token"
+	ErrorUnsafeCaptchaToken = "unsafe captcha token"
 	ErrorUnknownRegionCode  = "unknown region code"
 	ErrorUnknownJWTError    = "unknown jwt error"
 )

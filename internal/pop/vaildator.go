@@ -17,6 +17,13 @@ import (
 	"time"
 )
 
+func ValidateRange(count int) error {
+	if count > 1 && count <= config.PopLimit {
+		return nil
+	}
+	return errors.New(internal.ErrorInvalidCountRange)
+}
+
 func getJWTIssuer(c *gin.Context) string {
 	secret := append([]byte(c.GetHeader("Host")), config.JWTCaptchaSecret...)
 	hash := sha256.Sum256(secret)
@@ -44,18 +51,21 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 	return tokenClaims.SignedString(config.JWTCaptchaSecret)
 }
 
-func ValidateCaptcha(ipAddress string, token string) bool {
+func ValidateCaptcha(ipAddress string, token string) error {
 	if !config.ReCaptchaStatus {
-		return true
+		return nil
 	}
 	if token == "" {
-		return false
+		return errors.New(internal.ErrorEmptyCaptchaToken)
 	}
 	result, err := recaptcha.Confirm(ipAddress, token)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return result
+	if !result {
+		return errors.New(internal.ErrorUnsafeCaptchaToken)
+	}
+	return err
 }
 
 func ValidateJWT(c *gin.Context, token string) (bool, error) {

@@ -15,6 +15,7 @@ func Response(c *gin.Context) {
 	ctx := context.Background()
 	token := c.Query("token")
 	ipAddress := c.ClientIP()
+
 	if token == "" {
 		newToken, err := IssueJWT(c, ctx)
 		if err == nil {
@@ -28,6 +29,7 @@ func Response(c *gin.Context) {
 		}
 		return
 	}
+
 	if status, err := ValidateJWT(c, token); !status {
 		var message string
 		if raised, ok := err.(*jwt.ValidationError); ok {
@@ -42,20 +44,29 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
+
 	captchaToken := c.Query("captcha_token")
-	if !ValidateCaptcha(ipAddress, captchaToken) {
+	if err := ValidateCaptcha(ipAddress, captchaToken); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"message": "unsafe captcha token",
+			"message": err.Error(),
 		})
 		return
 	}
+
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "invalid count",
+			"message": internal.ErrorInvalidCount,
 		})
 		return
 	}
+	if err := ValidateRange(count); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	regionCode, err := GetRegionCode(ctx, ipAddress)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -63,6 +74,7 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
+
 	pop := NewPop(count, ipAddress, regionCode)
 	stepTimestamp := getCurrentStepTimestamp()
 	key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
@@ -72,6 +84,7 @@ func Response(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+
 	newToken, err := IssueJWT(c, ctx)
 	if err == nil {
 		c.JSON(http.StatusCreated, gin.H{

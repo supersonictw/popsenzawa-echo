@@ -18,6 +18,7 @@ var (
 	ReCaptchaStatus   bool
 	JWTCaptchaSecret  []byte
 	JWTExpired        time.Duration
+	PopLimit          int
 )
 
 func init() {
@@ -56,4 +57,9 @@ func init() {
 		panic(err)
 	}
 	JWTExpired = time.Duration(jwtExpired)
+
+	PopLimit, err = strconv.Atoi(Get(internal.ConfigRefreshDelay))
+	if err != nil {
+		panic(err)
+	}
 }
