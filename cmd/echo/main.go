@@ -7,6 +7,7 @@ import (
 	"github.com/supersonictw/popcat-echo/internal/leaderboard"
 	"github.com/supersonictw/popcat-echo/internal/pop"
 	"log"
+	"time"
 )
 
 func main() {
@@ -18,6 +19,7 @@ func main() {
 	fmt.Println("(c) 2021 SuperSonic. https://github.com/supersonictw")
 	fmt.Println()
 
+	time.Sleep(time.Second)
 	leaderboard.PrepareCache()
 	go pop.Queue()
 
