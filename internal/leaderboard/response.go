@@ -9,13 +9,18 @@ import (
 
 func Response(c *gin.Context) {
 	server := sse.New()
+	server.CreateStream("messages")
+	go listen(server)
 	server.HTTPHandler(c.Writer, c.Request)
+}
+
+func listen(server *sse.Server) {
 	for {
 		jsonBytes, err := json.Marshal(fetchRegionPops())
 		if err != nil {
 			panic(err)
 		}
-		server.Publish("message", &sse.Event{
+		server.Publish("messages", &sse.Event{
 			Data: jsonBytes,
 		})
 		time.Sleep(time.Second)
