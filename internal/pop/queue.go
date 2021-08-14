@@ -14,11 +14,11 @@ func Queue() {
 	for {
 		stepTimestamp := getCurrentStepTimestamp() - config.RefreshInterval*config.RefreshDelay
 		key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
-		length := config.RDB.LLen(ctx, key).Val()
+		length := redisClient.LLen(ctx, key).Val()
 		if length == 0 {
 			continue
 		}
-		allResource := config.RDB.LRange(ctx, key, 0, length).Val()
+		allResource := redisClient.LRange(ctx, key, 0, length).Val()
 		regionPops := make(map[string]*Pop)
 		addressPops := make(map[string]*Pop)
 		for _, value := range allResource {
@@ -47,7 +47,7 @@ func Queue() {
 		for _, value := range addressPops {
 			go updateAddressPop(sg, value)
 		}
-		config.RDB.Del(ctx, key)
+		redisClient.Del(ctx, key)
 		sg.Wait()
 		if getCurrentStepTimestamp() == stepTimestamp {
 			time.Sleep(time.Second)
@@ -56,7 +56,7 @@ func Queue() {
 }
 
 func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
-	stmt, err := config.DB.Prepare(
+	stmt, err := mysqlClient.Prepare(
 		"INSERT INTO `region`(`code`, `count`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
 	if err != nil {
@@ -70,7 +70,7 @@ func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
 }
 
 func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
-	stmt, err := config.DB.Prepare(
+	stmt, err := mysqlClient.Prepare(
 		"INSERT INTO `address`(`address`, `count`, `region`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
 	if err != nil {

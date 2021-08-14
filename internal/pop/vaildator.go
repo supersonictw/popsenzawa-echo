@@ -87,7 +87,7 @@ func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
 
 func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
 	key := fmt.Sprintf("%s:%s", config.CacheNamespaceGeo, ipAddress)
-	return config.RDB.Get(ctx, key).Val()
+	return redisClient.Get(ctx, key).Val()
 }
 
 func queryRegionCodeFromAPI(ipAddress string) string {
