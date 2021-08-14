@@ -14,6 +14,7 @@ func Response(c *gin.Context) {
 	server.CreateStream("messages")
 	go listen(ctx, server)
 	server.HTTPHandler(c.Writer, c.Request)
+	server.Close()
 	cancel()
 }
 
