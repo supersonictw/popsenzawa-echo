@@ -12,7 +12,7 @@ import (
 func Queue() {
 	for {
 		stepTimestamp := getPreviousStepTimestamp()
-		doTask(stepTimestamp)
+		go doTask(stepTimestamp)
 		for {
 			if getPreviousStepTimestamp() == stepTimestamp {
 				time.Sleep(time.Second)
