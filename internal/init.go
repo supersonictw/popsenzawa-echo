@@ -24,6 +24,7 @@ var (
 	CacheNamespaceGeo string
 	ReCaptchaStatus   bool
 	JWTCaptchaSecret  string
+	JWTExpired        time.Duration
 )
 
 func init() {
@@ -80,4 +81,10 @@ func init() {
 	} else {
 		JWTCaptchaSecret = uuid.NewString()
 	}
+
+	jwtExpired, err := strconv.Atoi(config.Get(config.JWTExpired))
+	if err != nil {
+		panic(err)
+	}
+	JWTExpired = time.Duration(jwtExpired)
 }

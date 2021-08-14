@@ -12,4 +12,5 @@ const (
 	MysqlDSN          = "MYSQL_DSN"
 	ReCaptchaSecret   = "RECAPTCHA_SECRET"
 	JWTSecret         = "JWT_SECRET"
+	JWTExpired        = "JWT_EXPIRED"
 )

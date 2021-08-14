@@ -32,11 +32,11 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 	}
 	claims := jwt.StandardClaims{
 		Audience:  ipAddress,
-		ExpiresAt: now.Add(20 * time.Second).Unix(),
+		ExpiresAt: now.Add(internal.JWTExpired * time.Second).Unix(),
 		Id:        uuid.NewString(),
 		IssuedAt:  now.Unix(),
 		Issuer:    issuer,
-		NotBefore: now.Add(10 * time.Second).Unix(),
+		NotBefore: now.Unix(),
 		Subject:   regionCode,
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
