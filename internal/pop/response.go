@@ -2,6 +2,7 @@ package pop
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/supersonictw/popcat-echo/internal"
@@ -13,6 +14,7 @@ import (
 func Response(c *gin.Context) {
 	ctx := context.Background()
 	token := c.Param("token")
+	ipAddress := c.ClientIP()
 	if token == "" {
 		newToken, err := IssueJWT(c, ctx)
 		if err == nil {
@@ -29,19 +31,11 @@ func Response(c *gin.Context) {
 	if status, err := ValidateJWT(c, token); !status {
 		var message string
 		if raised, ok := err.(*jwt.ValidationError); ok {
-			if raised.Errors&jwt.ValidationErrorMalformed != 0 {
-				message = echoErrors.JWTMalformed
-			} else if raised.Errors&jwt.ValidationErrorUnverifiable != 0 {
-				message = echoErrors.JWTSignatureUnacceptable
-			} else if raised.Errors&jwt.ValidationErrorSignatureInvalid != 0 {
-				message = echoErrors.JWTSignatureInvalid
-			} else if raised.Errors&jwt.ValidationErrorExpired != 0 {
-				message = echoErrors.JWTExpired
-			} else if raised.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				message = echoErrors.JWTNotValidYet
-			} else {
-				message = echoErrors.JWTInvalid
-			}
+			message = raised.Error()
+		} else if err != nil {
+			message = err.Error()
+		} else {
+			message = echoErrors.UnknownJWTError
 		}
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": message,
@@ -49,7 +43,7 @@ func Response(c *gin.Context) {
 		return
 	}
 	captchaToken := c.Param("captcha_token")
-	if !ValidateCaptcha(c.ClientIP(), captchaToken) {
+	if !ValidateCaptcha(ipAddress, captchaToken) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "unsafe captcha token",
 		})
@@ -62,8 +56,17 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
-	pop := NewPop(count, "", "")
-	internal.RDB.LPush(ctx, "", pop.JSON())
+	regionCode, err := GetRegionCode(ctx, ipAddress)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	pop := NewPop(count, ipAddress, regionCode)
+	stepTimestamp := getCurrentStepTimestamp()
+	key := fmt.Sprintf("%s:%d", internal.CacheNamespacePop, stepTimestamp)
+	internal.RDB.LPush(ctx, key, pop.JSON())
 	newToken, err := IssueJWT(c, ctx)
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{
