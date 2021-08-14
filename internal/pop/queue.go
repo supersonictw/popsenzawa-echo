@@ -10,51 +10,59 @@ import (
 )
 
 func Queue() {
-	ctx := context.Background()
 	for {
-		stepTimestamp := getCurrentStepTimestamp() - config.RefreshInterval*config.RefreshDelay
-		key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
-		length := redisClient.LLen(ctx, key).Val()
-		if length == 0 {
-			continue
-		}
-		allResource := redisClient.LRange(ctx, key, 0, length).Val()
-		regionPops := make(map[string]*Pop)
-		addressPops := make(map[string]*Pop)
-		for _, value := range allResource {
-			pop := new(Pop)
-			err := json.Unmarshal([]byte(value), pop)
-			if err != nil {
-				panic(err)
-			}
-			if origin, ok := regionPops[pop.Region]; ok {
-				origin.Count += pop.Count
+		stepTimestamp := getPreviousStepTimestamp()
+		doTask(stepTimestamp)
+		for {
+			if getPreviousStepTimestamp() == stepTimestamp {
+				time.Sleep(time.Second)
 			} else {
-				regionPops[pop.Region] = pop
-			}
-			if origin, ok := addressPops[pop.Address]; ok {
-				origin.Count += pop.Count
-			} else {
-				addressPops[pop.Address] = pop
+				break
 			}
 		}
-		sg := new(sync.WaitGroup)
-		sg.Add(int(length * 2))
-		for _, value := range regionPops {
-			go updateRegionPop(sg, value)
-		}
-		for _, value := range addressPops {
-			go updateAddressPop(sg, value)
-		}
-		err := redisClient.Del(ctx, key).Err()
+	}
+}
+
+func doTask(stepTimestamp int64) {
+	ctx := context.Background()
+	key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
+	length := redisClient.LLen(ctx, key).Val()
+	if length == 0 {
+		return
+	}
+	allResource := redisClient.LRange(ctx, key, 0, length).Val()
+	regionPops := make(map[string]*Pop)
+	addressPops := make(map[string]*Pop)
+	for _, value := range allResource {
+		pop := new(Pop)
+		err := json.Unmarshal([]byte(value), pop)
 		if err != nil {
 			panic(err)
 		}
-		sg.Wait()
-		if getCurrentStepTimestamp() == stepTimestamp {
-			time.Sleep(time.Second)
+		if origin, ok := regionPops[pop.Region]; ok {
+			origin.Count += pop.Count
+		} else {
+			regionPops[pop.Region] = pop
+		}
+		if origin, ok := addressPops[pop.Address]; ok {
+			origin.Count += pop.Count
+		} else {
+			addressPops[pop.Address] = pop
 		}
 	}
+	sg := new(sync.WaitGroup)
+	sg.Add(int(length * 2))
+	for _, value := range regionPops {
+		go updateRegionPop(sg, value)
+	}
+	for _, value := range addressPops {
+		go updateAddressPop(sg, value)
+	}
+	err := redisClient.Del(ctx, key).Err()
+	if err != nil {
+		panic(err)
+	}
+	sg.Wait()
 }
 
 func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
@@ -88,4 +96,8 @@ func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
 func getCurrentStepTimestamp() int64 {
 	timestamp := time.Now().Unix()
 	return timestamp / config.RefreshInterval * config.RefreshInterval
+}
+
+func getPreviousStepTimestamp() int64 {
+	return getCurrentStepTimestamp() - config.RefreshInterval*config.RefreshDelay
 }
