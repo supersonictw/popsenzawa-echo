@@ -91,6 +91,7 @@ func Response(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+	go AppendRegionCount(ctx, regionCode, pop.Count)
 	go AppendAddressCountInRefreshInterval(ctx, ipAddress, pop.Count)
 
 	newToken, err := IssueJWT(c, ctx)

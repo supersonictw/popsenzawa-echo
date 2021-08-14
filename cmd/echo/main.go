@@ -18,12 +18,14 @@ func main() {
 	fmt.Println("(c) 2021 SuperSonic. https://github.com/supersonictw")
 	fmt.Println()
 
+	leaderboard.PrepareCache()
 	go pop.Queue()
 
 	r := gin.Default()
 	r.GET("/leaderboard", leaderboard.Response)
 	r.POST("/pop", pop.Response)
 
+	fmt.Println("Start")
 	err := r.Run(config.PublishAddress)
 	if err != nil {
 		log.Fatal(err)
