@@ -13,7 +13,7 @@ func GetRedis() *redis.Client {
 		log.Fatal(err)
 	}
 	return redis.NewClient(&redis.Options{
-		Addr:     Get(internal.ConfigRedisHostname),
+		Addr:     Get(internal.ConfigRedisAddress),
 		Password: Get(internal.ConfigRedisPassword),
 		DB:       redisDatabase,
 	})

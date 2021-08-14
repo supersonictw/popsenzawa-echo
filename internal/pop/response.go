@@ -66,7 +66,12 @@ func Response(c *gin.Context) {
 	pop := NewPop(count, ipAddress, regionCode)
 	stepTimestamp := getCurrentStepTimestamp()
 	key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
-	redisClient.LPush(ctx, key, pop.JSON())
+	err = redisClient.LPush(ctx, key, pop.JSON()).Err()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+	}
 	newToken, err := IssueJWT(c, ctx)
 	if err == nil {
 		c.JSON(http.StatusCreated, gin.H{

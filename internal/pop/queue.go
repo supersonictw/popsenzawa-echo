@@ -31,12 +31,11 @@ func Queue() {
 				origin.Count += pop.Count
 			} else {
 				regionPops[pop.Region] = pop
-				regionPops[pop.Region].Address = ""
 			}
 			if origin, ok := addressPops[pop.Address]; ok {
 				origin.Count += pop.Count
 			} else {
-				addressPops[pop.Region] = pop
+				addressPops[pop.Address] = pop
 			}
 		}
 		sg := new(sync.WaitGroup)
@@ -47,7 +46,10 @@ func Queue() {
 		for _, value := range addressPops {
 			go updateAddressPop(sg, value)
 		}
-		redisClient.Del(ctx, key)
+		err := redisClient.Del(ctx, key).Err()
+		if err != nil {
+			panic(err)
+		}
 		sg.Wait()
 		if getCurrentStepTimestamp() == stepTimestamp {
 			time.Sleep(time.Second)
@@ -71,7 +73,7 @@ func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
 
 func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
 	stmt, err := mysqlClient.Prepare(
-		"INSERT INTO `address`(`address`, `count`, `region`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
+		"INSERT INTO `address`(`address`, `count`, `region`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
 	if err != nil {
 		panic(err)
