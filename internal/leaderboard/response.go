@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/r3labs/sse/v2"
-	"github.com/supersonictw/popcat-echo/internal"
+	"github.com/supersonictw/popcat-echo/internal/config"
 	"time"
 )
 
@@ -24,7 +24,7 @@ func Response(c *gin.Context) {
 }
 
 func fetchRegionPops() map[string]interface{} {
-	rows, err := internal.DB.Query(
+	rows, err := config.DB.Query(
 		"SELECT `code`, `count` FROM `region`",
 	)
 	if err != nil {

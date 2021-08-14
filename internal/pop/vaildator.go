@@ -11,14 +11,14 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/supersonictw/popcat-echo/internal"
-	echoErrors "github.com/supersonictw/popcat-echo/internal/error"
+	"github.com/supersonictw/popcat-echo/internal/config"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
 func getJWTIssuer(c *gin.Context) string {
-	hash := sha256.Sum256([]byte(c.GetHeader("Host") + internal.JWTCaptchaSecret))
+	hash := sha256.Sum256([]byte(c.GetHeader("Host") + config.JWTCaptchaSecret))
 	return fmt.Sprintf("%x", hash)
 }
 
@@ -32,7 +32,7 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 	}
 	claims := jwt.StandardClaims{
 		Audience:  ipAddress,
-		ExpiresAt: now.Add(internal.JWTExpired * time.Second).Unix(),
+		ExpiresAt: now.Add(config.JWTExpired * time.Second).Unix(),
 		Id:        uuid.NewString(),
 		IssuedAt:  now.Unix(),
 		Issuer:    issuer,
@@ -40,11 +40,11 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 		Subject:   regionCode,
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return tokenClaims.SignedString(internal.JWTCaptchaSecret)
+	return tokenClaims.SignedString(config.JWTCaptchaSecret)
 }
 
 func ValidateCaptcha(ipAddress string, token string) bool {
-	if !internal.ReCaptchaStatus {
+	if !config.ReCaptchaStatus {
 		return true
 	}
 	if token == "" {
@@ -62,7 +62,7 @@ func ValidateJWT(c *gin.Context, token string) (bool, error) {
 		token,
 		&jwt.StandardClaims{},
 		func(token *jwt.Token) (i interface{}, err error) {
-			return internal.JWTCaptchaSecret, nil
+			return config.JWTCaptchaSecret, nil
 		},
 	)
 	if err != nil {
@@ -81,12 +81,12 @@ func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
 	if value := queryRegionCodeFromAPI(ipAddress); value != "" {
 		return value, nil
 	}
-	return "", errors.New(echoErrors.UnknownRegionCode)
+	return "", errors.New(internal.ErrorUnknownRegionCode)
 }
 
 func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
-	key := fmt.Sprintf("%s:%s", internal.CacheNamespaceGeo, ipAddress)
-	return internal.RDB.Get(ctx, key).Val()
+	key := fmt.Sprintf("%s:%s", config.CacheNamespaceGeo, ipAddress)
+	return config.RDB.Get(ctx, key).Val()
 }
 
 func queryRegionCodeFromAPI(ipAddress string) string {

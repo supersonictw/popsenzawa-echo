@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/supersonictw/popcat-echo/internal"
-	echoErrors "github.com/supersonictw/popcat-echo/internal/error"
+	"github.com/supersonictw/popcat-echo/internal/config"
 	"net/http"
 	"strconv"
 )
@@ -35,7 +35,7 @@ func Response(c *gin.Context) {
 		} else if err != nil {
 			message = err.Error()
 		} else {
-			message = echoErrors.UnknownJWTError
+			message = internal.ErrorUnknownJWTError
 		}
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": message,
@@ -65,8 +65,8 @@ func Response(c *gin.Context) {
 	}
 	pop := NewPop(count, ipAddress, regionCode)
 	stepTimestamp := getCurrentStepTimestamp()
-	key := fmt.Sprintf("%s:%d", internal.CacheNamespacePop, stepTimestamp)
-	internal.RDB.LPush(ctx, key, pop.JSON())
+	key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
+	config.RDB.LPush(ctx, key, pop.JSON())
 	newToken, err := IssueJWT(c, ctx)
 	if err == nil {
 		c.JSON(http.StatusOK, gin.H{

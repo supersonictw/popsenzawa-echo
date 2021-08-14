@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"database/sql"
@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/supersonictw/popcat-echo/internal/config"
+	"github.com/supersonictw/popcat-echo/internal"
 	"log"
 	"strconv"
 	"time"
@@ -27,9 +27,9 @@ var (
 )
 
 func init() {
-	PublishAddress = config.Get(config.PublishAddress)
+	PublishAddress = Get(internal.ConfigPublishAddress)
 
-	DB, err := sql.Open("mysql", config.Get(config.MysqlDSN))
+	DB, err := sql.Open("mysql", Get(internal.ConfigMysqlDSN))
 	if err != nil {
 		panic(err)
 	}
@@ -37,43 +37,43 @@ func init() {
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(10)
 
-	redisDatabase, err := strconv.Atoi(config.Get(config.RedisDatabase))
+	redisDatabase, err := strconv.Atoi(Get(internal.ConfigRedisDatabase))
 	if err != nil {
 		log.Fatal(err)
 	}
 	RDB = redis.NewClient(&redis.Options{
-		Addr:     config.Get(config.RedisHostname),
-		Password: config.Get(config.RedisPassword),
+		Addr:     Get(internal.ConfigRedisHostname),
+		Password: Get(internal.ConfigRedisPassword),
 		DB:       redisDatabase,
 	})
 
-	refreshIntervalInt, err := strconv.Atoi(config.Get(config.RefreshInterval))
+	refreshIntervalInt, err := strconv.Atoi(Get(internal.ConfigRefreshInterval))
 	if err != nil {
 		panic(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
-	refreshDelayInt, err := strconv.Atoi(config.Get(config.RefreshDelay))
+	refreshDelayInt, err := strconv.Atoi(Get(internal.ConfigRefreshDelay))
 	if err != nil {
 		panic(err)
 	}
 	RefreshDelay = int64(refreshDelayInt)
-	CacheNamespacePop = config.Get(config.RedisNamespacePop)
-	CacheNamespaceGeo = config.Get(config.RedisNamespaceGeo)
+	CacheNamespacePop = Get(internal.ConfigRedisNamespacePop)
+	CacheNamespaceGeo = Get(internal.ConfigRedisNamespaceGeo)
 
-	if secret := config.Get(config.ReCaptchaSecret); secret != "" {
+	if secret := Get(internal.ConfigReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)
 		ReCaptchaStatus = true
 	} else {
 		ReCaptchaStatus = false
 	}
 
-	if secret := config.Get(config.JWTSecret); secret != "" {
+	if secret := Get(internal.ConfigJWTSecret); secret != "" {
 		JWTCaptchaSecret = secret
 	} else {
 		JWTCaptchaSecret = uuid.NewString()
 	}
 
-	jwtExpired, err := strconv.Atoi(config.Get(config.JWTExpired))
+	jwtExpired, err := strconv.Atoi(Get(internal.ConfigJWTExpired))
 	if err != nil {
 		panic(err)
 	}

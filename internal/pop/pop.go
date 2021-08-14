@@ -3,9 +3,9 @@ package pop
 import "encoding/json"
 
 type Pop struct {
-	Count   int
-	Address string
-	Region  string
+	Count   int    `json:"count"`
+	Address string `json:"address"`
+	Region  string `json:"region"`
 }
 
 func NewPop(count int, address string, region string) *Pop {
