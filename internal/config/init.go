@@ -1,11 +1,11 @@
 package config
 
 import (
+	"crypto/rand"
 	"database/sql"
 	"github.com/dpapathanasiou/go-recaptcha"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/supersonictw/popcat-echo/internal"
 	"log"
@@ -22,7 +22,7 @@ var (
 	CacheNamespacePop string
 	CacheNamespaceGeo string
 	ReCaptchaStatus   bool
-	JWTCaptchaSecret  string
+	JWTCaptchaSecret  []byte
 	JWTExpired        time.Duration
 )
 
@@ -68,9 +68,11 @@ func init() {
 	}
 
 	if secret := Get(internal.ConfigJWTSecret); secret != "" {
-		JWTCaptchaSecret = secret
+		JWTCaptchaSecret = []byte(secret)
 	} else {
-		JWTCaptchaSecret = uuid.NewString()
+		blk := make([]byte, 32)
+		_, err = rand.Read(blk)
+		JWTCaptchaSecret = blk
 	}
 
 	jwtExpired, err := strconv.Atoi(Get(internal.ConfigJWTExpired))

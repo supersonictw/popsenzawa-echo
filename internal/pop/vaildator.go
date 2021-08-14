@@ -18,7 +18,8 @@ import (
 )
 
 func getJWTIssuer(c *gin.Context) string {
-	hash := sha256.Sum256([]byte(c.GetHeader("Host") + config.JWTCaptchaSecret))
+	secret := append([]byte(c.GetHeader("Host")), config.JWTCaptchaSecret...)
+	hash := sha256.Sum256(secret)
 	return fmt.Sprintf("%x", hash)
 }
 
