@@ -10,15 +10,17 @@ import (
 )
 
 var (
-	PublishAddress    string
-	RefreshInterval   int64
-	RefreshDelay      int64
-	CacheNamespacePop string
-	CacheNamespaceGeo string
-	ReCaptchaStatus   bool
-	JWTCaptchaSecret  []byte
-	JWTExpired        time.Duration
-	PopLimit          int
+	PublishAddress     string
+	RefreshInterval    int64
+	RefreshDelay       int64
+	CacheNamespacePop  string
+	CacheNamespaceGeo  string
+	CacheNamespaceRate string
+	ReCaptchaStatus    bool
+	JWTCaptchaSecret   []byte
+	JWTExpired         time.Duration
+	PopLimit           int
+	RateLimit          int
 )
 
 func init() {
@@ -34,8 +36,10 @@ func init() {
 		panic(err)
 	}
 	RefreshDelay = int64(refreshDelayInt)
+
 	CacheNamespacePop = Get(internal.ConfigRedisNamespacePop)
 	CacheNamespaceGeo = Get(internal.ConfigRedisNamespaceGeo)
+	CacheNamespaceRate = Get(internal.ConfigRedisNamespaceRate)
 
 	if secret := Get(internal.ConfigReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)
@@ -59,6 +63,10 @@ func init() {
 	JWTExpired = time.Duration(jwtExpired)
 
 	PopLimit, err = strconv.Atoi(Get(internal.ConfigPopLimit))
+	if err != nil {
+		panic(err)
+	}
+	RateLimit, err = strconv.Atoi(Get(internal.ConfigRateLimit))
 	if err != nil {
 		panic(err)
 	}

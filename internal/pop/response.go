@@ -53,6 +53,13 @@ func Response(c *gin.Context) {
 		return
 	}
 
+	if err := ValidateAddressRate(ctx, ipAddress); err != nil {
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -84,6 +91,7 @@ func Response(c *gin.Context) {
 			"message": err.Error(),
 		})
 	}
+	go AppendAddressCountInRefreshInterval(ctx, ipAddress, pop.Count)
 
 	newToken, err := IssueJWT(c, ctx)
 	if err == nil {

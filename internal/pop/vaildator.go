@@ -118,3 +118,14 @@ func queryRegionCodeFromAPI(ipAddress string) string {
 	}
 	return ""
 }
+
+func ValidateAddressRate(ctx context.Context, address string) error {
+	if config.RateLimit == 0 {
+		return nil
+	}
+	sum := GetAddressCountInRefreshInterval(ctx, address)
+	if sum > config.RateLimit {
+		return errors.New(internal.ErrorAddressRateLimited)
+	}
+	return nil
+}
