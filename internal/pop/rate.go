@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"strconv"
+	"time"
 )
 
 func GetAddressCountInRefreshInterval(ctx context.Context, address string) int {
@@ -31,6 +32,6 @@ func AppendAddressCountInRefreshInterval(ctx context.Context, address string, co
 		panic(err)
 	}
 	if previous == 0 {
-		redisClient.Expire(ctx, key, config.JWTExpired)
+		redisClient.Expire(ctx, key, config.JWTExpired*time.Second)
 	}
 }
