@@ -25,7 +25,7 @@ func ValidateRange(count int) error {
 }
 
 func getJWTIssuer(c *gin.Context) string {
-	secret := append([]byte(c.GetHeader("Host")), config.JWTCaptchaSecret...)
+	secret := append([]byte(c.Request.Host), config.JWTCaptchaSecret...)
 	hash := sha256.Sum256(secret)
 	return fmt.Sprintf("%x", hash)
 }
