@@ -45,6 +45,10 @@ func doTask(stepTimestamp int64) {
 			regionPops[pop.Region] = pop
 		}
 		if origin, ok := addressPops[pop.Address]; ok {
+			if config.RateLimit != 0 && pop.Count > config.RateLimit {
+				regionPops[pop.Region].Count -= pop.Count - config.RateLimit
+				pop.Count = config.RateLimit
+			}
 			origin.Count += pop.Count
 		} else {
 			addressPops[pop.Address] = pop
