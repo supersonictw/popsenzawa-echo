@@ -18,7 +18,7 @@ import (
 )
 
 func ValidateRange(count int) error {
-	if count < 0 && count <= config.PopLimit {
+	if count >= 0 && count <= config.PopLimit {
 		return nil
 	}
 	return errors.New(internal.ErrorInvalidCountRange)
