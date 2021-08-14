@@ -13,7 +13,7 @@ import (
 
 func Response(c *gin.Context) {
 	ctx := context.Background()
-	token := c.Param("token")
+	token := c.Query("token")
 	ipAddress := c.ClientIP()
 	if token == "" {
 		newToken, err := IssueJWT(c, ctx)
@@ -42,14 +42,14 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
-	captchaToken := c.Param("captcha_token")
+	captchaToken := c.Query("captcha_token")
 	if !ValidateCaptcha(ipAddress, captchaToken) {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": "unsafe captcha token",
 		})
 		return
 	}
-	count, err := strconv.Atoi(c.Param("count"))
+	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid count",
