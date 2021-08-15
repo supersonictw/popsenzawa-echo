@@ -16,6 +16,7 @@ const (
 	ConfigJWTExpired         = "JWT_EXPIRED"
 	ConfigPopLimit           = "POP_LIMIT"
 	ConfigRateLimit          = "RATE_LIMIT"
+	ConfigForceFixRate       = "FORCE_FIX_RATE"
 	ErrorInvalidCount        = "invalid count"
 	ErrorInvalidCountRange   = "invalid count range"
 	ErrorAddressRateLimited  = "address rate limited"

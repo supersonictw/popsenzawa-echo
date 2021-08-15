@@ -21,6 +21,7 @@ var (
 	JWTExpired         time.Duration
 	PopLimit           int
 	RateLimit          int
+	ForceFixRate       bool
 )
 
 func init() {
@@ -69,5 +70,11 @@ func init() {
 	RateLimit, err = strconv.Atoi(Get(internal.ConfigRateLimit))
 	if err != nil {
 		panic(err)
+	}
+
+	if Get(internal.ConfigForceFixRate) == "yes" {
+		ForceFixRate = true
+	} else {
+		ForceFixRate = false
 	}
 }
