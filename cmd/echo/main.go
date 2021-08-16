@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	ConfigCORSSupport      = "CORS_SUPPORT"
-	ConfigFrontendHostname = "FRONTEND_HOSTNAME"
-	ConfigFrontendSSL      = "FRONTEND_SSL"
+	EnvCORSSupport      config.EnvKey = "CORS_SUPPORT"
+	EnvFrontendHostname config.EnvKey = "FRONTEND_HOSTNAME"
+	EnvFrontendSSL      config.EnvKey = "FRONTEND_SSL"
 )
 
 func main() {
@@ -31,9 +31,9 @@ func main() {
 
 	r := gin.Default()
 
-	if config.Get(ConfigCORSSupport) == "yes" {
+	if config.Get(EnvCORSSupport) == "yes" {
 		var frontendURI string
-		if hostname := config.Get(ConfigFrontendHostname); config.Get(ConfigFrontendSSL) == "yes" {
+		if hostname := config.Get(EnvFrontendHostname); config.Get(EnvFrontendSSL) == "yes" {
 			frontendURI = fmt.Sprintf("https://%s", hostname)
 		} else {
 			frontendURI = fmt.Sprintf("http://%s", hostname)

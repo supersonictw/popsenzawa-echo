@@ -5,8 +5,8 @@ import (
 	"os"
 )
 
-func Get(key string) string {
-	value, exists := os.LookupEnv(key)
+func Get(key EnvKey) string {
+	value, exists := os.LookupEnv(string(key))
 	if !exists {
 		log.Fatalf("Env lookup failed: %s", key)
 	}

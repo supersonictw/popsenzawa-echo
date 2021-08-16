@@ -3,12 +3,11 @@ package config
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/supersonictw/popcat-echo/internal"
 	"time"
 )
 
 func GetMySQL() *sql.DB {
-	mysql, err := sql.Open("mysql", Get(internal.ConfigMysqlDSN))
+	mysql, err := sql.Open("mysql", Get(EnvMysqlDSN))
 	if err != nil {
 		panic(err)
 	}

@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"github.com/dpapathanasiou/go-recaptcha"
 	_ "github.com/joho/godotenv/autoload"
-	"github.com/supersonictw/popcat-echo/internal"
 	"strconv"
 	"time"
 )
@@ -25,31 +24,31 @@ var (
 )
 
 func init() {
-	PublishAddress = Get(internal.ConfigPublishAddress)
+	PublishAddress = Get(EnvPublishAddress)
 
-	refreshIntervalInt, err := strconv.Atoi(Get(internal.ConfigRefreshInterval))
+	refreshIntervalInt, err := strconv.Atoi(Get(EnvRefreshInterval))
 	if err != nil {
 		panic(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
-	refreshDelayInt, err := strconv.Atoi(Get(internal.ConfigRefreshDelay))
+	refreshDelayInt, err := strconv.Atoi(Get(EnvRefreshDelay))
 	if err != nil {
 		panic(err)
 	}
 	RefreshDelay = int64(refreshDelayInt)
 
-	CacheNamespacePop = Get(internal.ConfigRedisNamespacePop)
-	CacheNamespaceGeo = Get(internal.ConfigRedisNamespaceGeo)
-	CacheNamespaceRate = Get(internal.ConfigRedisNamespaceRate)
+	CacheNamespacePop = Get(EnvRedisNamespacePop)
+	CacheNamespaceGeo = Get(EnvRedisNamespaceGeo)
+	CacheNamespaceRate = Get(EnvRedisNamespaceRate)
 
-	if secret := Get(internal.ConfigReCaptchaSecret); secret != "" {
+	if secret := Get(EnvReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)
 		ReCaptchaStatus = true
 	} else {
 		ReCaptchaStatus = false
 	}
 
-	if secret := Get(internal.ConfigJWTSecret); secret != "" {
+	if secret := Get(EnvJWTSecret); secret != "" {
 		JWTCaptchaSecret = []byte(secret)
 	} else {
 		blk := make([]byte, 32)
@@ -57,22 +56,22 @@ func init() {
 		JWTCaptchaSecret = blk
 	}
 
-	jwtExpired, err := strconv.Atoi(Get(internal.ConfigJWTExpired))
+	jwtExpired, err := strconv.Atoi(Get(EnvJWTExpired))
 	if err != nil {
 		panic(err)
 	}
 	JWTExpired = time.Duration(jwtExpired)
 
-	PopLimit, err = strconv.Atoi(Get(internal.ConfigPopLimit))
+	PopLimit, err = strconv.Atoi(Get(EnvPopLimit))
 	if err != nil {
 		panic(err)
 	}
-	RateLimit, err = strconv.Atoi(Get(internal.ConfigRateLimit))
+	RateLimit, err = strconv.Atoi(Get(EnvRateLimit))
 	if err != nil {
 		panic(err)
 	}
 
-	if Get(internal.ConfigForceFixRate) == "yes" {
+	if Get(EnvForceFixRate) == "yes" {
 		ForceFixRate = true
 	} else {
 		ForceFixRate = false

@@ -4,14 +4,13 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/dpapathanasiou/go-recaptcha"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
-	"github.com/supersonictw/popcat-echo/internal"
 	"github.com/supersonictw/popcat-echo/internal/config"
+	EchoError "github.com/supersonictw/popcat-echo/internal/error"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -22,7 +21,7 @@ func ValidateRange(count int) error {
 	if count >= 0 && count <= config.PopLimit {
 		return nil
 	}
-	return errors.New(internal.ErrorInvalidCountRange)
+	return EchoError.NewError(EchoError.InvalidCountRange)
 }
 
 func getJWTIssuer(c *gin.Context) string {
@@ -57,14 +56,14 @@ func ValidateCaptcha(ipAddress string, token string) error {
 		return nil
 	}
 	if token == "" {
-		return errors.New(internal.ErrorEmptyCaptchaToken)
+		return EchoError.NewError(EchoError.EmptyCaptchaToken)
 	}
 	result, err := recaptcha.Confirm(ipAddress, token)
 	if err != nil {
 		return err
 	}
 	if !result {
-		return errors.New(internal.ErrorUnsafeCaptchaToken)
+		return EchoError.NewError(EchoError.UnsafeCaptchaToken)
 	}
 	return err
 }
@@ -99,7 +98,7 @@ func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
 		}
 		return value, nil
 	}
-	return "", errors.New(internal.ErrorUnknownRegionCode)
+	return "", EchoError.NewError(EchoError.UnknownRegionCode)
 }
 
 func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
@@ -132,7 +131,7 @@ func ValidateAddressRate(ctx context.Context, address string) error {
 	}
 	sum := GetAddressCountInRefreshInterval(ctx, address)
 	if sum > config.RateLimit {
-		return errors.New(internal.ErrorAddressRateLimited)
+		return EchoError.NewError(EchoError.AddressRateLimited)
 	}
 	return nil
 }

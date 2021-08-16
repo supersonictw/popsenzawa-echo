@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/supersonictw/popcat-echo/internal"
 	"github.com/supersonictw/popcat-echo/internal/config"
+	EchoError "github.com/supersonictw/popcat-echo/internal/error"
 	"log"
 	"net/http"
 	"strconv"
@@ -41,7 +41,9 @@ func Response(c *gin.Context) {
 			log.Println(err)
 			message = err.Error()
 		} else {
-			message = internal.ErrorUnknownJWTError
+			err := EchoError.NewError(EchoError.UnknownJWTError)
+			log.Println(err)
+			message = err.Error()
 		}
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": message,
@@ -69,7 +71,7 @@ func Response(c *gin.Context) {
 	count, err := strconv.Atoi(c.Query("count"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": internal.ErrorInvalidCount,
+			"message": EchoError.InvalidCount,
 		})
 		return
 	}
