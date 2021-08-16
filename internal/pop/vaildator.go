@@ -13,6 +13,7 @@ import (
 	"github.com/supersonictw/popcat-echo/internal"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
 )
@@ -90,6 +91,12 @@ func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
 		return value, nil
 	}
 	if value := queryRegionCodeFromAPI(ipAddress); value != "" {
+		key := fmt.Sprintf("%s:%s", config.CacheNamespaceGeo, ipAddress)
+		err := redisClient.Set(ctx, key, value, 3600).Err()
+		if err != nil {
+			log.Println(err)
+			return value, err
+		}
 		return value, nil
 	}
 	return "", errors.New(internal.ErrorUnknownRegionCode)

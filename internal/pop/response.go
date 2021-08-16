@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/supersonictw/popcat-echo/internal"
 	"github.com/supersonictw/popcat-echo/internal/config"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -100,6 +101,7 @@ func Response(c *gin.Context) {
 	key := fmt.Sprintf("%s:%d", config.CacheNamespacePop, stepTimestamp)
 	err = redisClient.LPush(ctx, key, pop.JSON()).Err()
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
