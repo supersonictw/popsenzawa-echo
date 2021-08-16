@@ -24,6 +24,7 @@ func Response(c *gin.Context) {
 				"new_token": newToken,
 			})
 		} else {
+			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
@@ -34,8 +35,10 @@ func Response(c *gin.Context) {
 	if status, err := ValidateJWT(c, token); !status {
 		var message string
 		if raised, ok := err.(*jwt.ValidationError); ok {
+			log.Println(raised)
 			message = raised.Error()
 		} else if err != nil {
+			log.Println(err)
 			message = err.Error()
 		} else {
 			message = internal.ErrorUnknownJWTError
@@ -48,6 +51,7 @@ func Response(c *gin.Context) {
 
 	captchaToken := c.Query("captcha_token")
 	if err := ValidateCaptcha(ipAddress, captchaToken); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
 		})
@@ -55,6 +59,7 @@ func Response(c *gin.Context) {
 	}
 
 	if err := ValidateAddressRate(ctx, ipAddress); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusTooManyRequests, gin.H{
 			"message": err.Error(),
 		})
@@ -69,6 +74,7 @@ func Response(c *gin.Context) {
 		return
 	}
 	if err := ValidateRange(count); err != nil {
+		log.Println(err)
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
@@ -81,6 +87,7 @@ func Response(c *gin.Context) {
 				"new_token": newToken,
 			})
 		} else {
+			log.Println(err)
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
@@ -90,6 +97,7 @@ func Response(c *gin.Context) {
 
 	regionCode, err := GetRegionCode(ctx, ipAddress)
 	if err != nil {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
@@ -115,6 +123,7 @@ func Response(c *gin.Context) {
 			"new_token": newToken,
 		})
 	} else {
+		log.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
