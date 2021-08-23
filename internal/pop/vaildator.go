@@ -109,13 +109,13 @@ func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
 func queryRegionCodeFromAPI(ipAddress string) string {
 	resp, err := http.Get("https://restapi.starinc.xyz/basic/ip/geo?ip_addr=" + ipAddress)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	result := make(map[string]interface{})
 	resultBytes, err := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(resultBytes, &result)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	if data, ok := result["data"].(map[string]interface{}); ok {
 		if country, ok := data["country"].(map[string]interface{}); ok {

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"github.com/dpapathanasiou/go-recaptcha"
 	_ "github.com/joho/godotenv/autoload"
+	"log"
 	"strconv"
 	"time"
 )
@@ -28,12 +29,12 @@ func init() {
 
 	refreshIntervalInt, err := strconv.Atoi(Get(EnvRefreshInterval))
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
 	refreshDelayInt, err := strconv.Atoi(Get(EnvRefreshDelay))
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	RefreshDelay = int64(refreshDelayInt)
 
@@ -52,23 +53,25 @@ func init() {
 		JWTCaptchaSecret = []byte(secret)
 	} else {
 		blk := make([]byte, 32)
-		_, err = rand.Read(blk)
+		if _, err = rand.Read(blk); err != nil {
+			log.Panicln(err)
+		}
 		JWTCaptchaSecret = blk
 	}
 
 	jwtExpired, err := strconv.Atoi(Get(EnvJWTExpired))
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	JWTExpired = time.Duration(jwtExpired)
 
 	PopLimit, err = strconv.Atoi(Get(EnvPopLimit))
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	RateLimit, err = strconv.Atoi(Get(EnvRateLimit))
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 
 	if Get(EnvForceFixRate) == "yes" {

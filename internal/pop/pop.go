@@ -1,6 +1,9 @@
 package pop
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+)
 
 type Pop struct {
 	Count   int    `json:"count"`
@@ -19,7 +22,7 @@ func NewPop(count int, address string, region string) *Pop {
 func (p *Pop) JSON() []byte {
 	val, err := json.Marshal(p)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	return val
 }

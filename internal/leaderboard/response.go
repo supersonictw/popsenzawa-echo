@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/r3labs/sse/v2"
 	"github.com/supersonictw/popcat-echo/internal/config"
+	"log"
 	"strconv"
 	"time"
 )
@@ -26,7 +27,7 @@ func listen(ctx context.Context, server *sse.Server) {
 		queryCtx := context.Background()
 		jsonBytes, err := json.Marshal(fetchRegionPopsFromRedis(queryCtx))
 		if err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 		select {
 		case <-ctx.Done():
@@ -46,13 +47,13 @@ func PrepareCache() {
 	keyGlobal := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "global")
 	err := redisClient.Set(ctx, keyGlobal, data["global"], 0).Err()
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	keyRegions := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "regions")
 	for i, region := range data["regions"].(map[string]int) {
 		err := redisClient.HSet(ctx, keyRegions, i, region).Err()
 		if err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 	}
 }
@@ -64,13 +65,13 @@ func fetchRegionPopsFromRedis(ctx context.Context) map[string]interface{} {
 	resultRegions := redisClient.HGetAll(ctx, keyRegions).Val()
 	sumGlobal, err := strconv.Atoi(resultGlobal)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	sumRegions := make(map[string]int, len(resultRegions))
 	for i, region := range resultRegions {
 		sumRegions[i], err = strconv.Atoi(region)
 		if err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 	}
 	return map[string]interface{}{
@@ -84,7 +85,7 @@ func fetchRegionPopsFromMySQL() map[string]interface{} {
 		"SELECT `code`, `count` FROM `region`",
 	)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	sum := 0
 	regions := make(map[string]int)
@@ -93,7 +94,7 @@ func fetchRegionPopsFromMySQL() map[string]interface{} {
 		var count int
 		err = rows.Scan(&code, &count)
 		if err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 		sum += count
 		regions[code] = count

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/supersonictw/popcat-echo/internal/config"
+	"log"
 	"sync"
 	"time"
 )
@@ -37,7 +38,7 @@ func doTask(stepTimestamp int64) {
 		pop := new(Pop)
 		err := json.Unmarshal([]byte(value), pop)
 		if err != nil {
-			panic(err)
+			log.Panicln(err)
 		}
 		if origin, ok := regionPops[pop.Region]; ok {
 			origin.Count += pop.Count
@@ -66,7 +67,7 @@ func doTask(stepTimestamp int64) {
 	}
 	err := redisClient.Del(ctx, key).Err()
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	sg.Wait()
 }
@@ -76,11 +77,11 @@ func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
 		"INSERT INTO `region`(`code`, `count`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	_, err = stmt.Exec(pop.Region, pop.Count, pop.Count)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	sg.Done()
 }
@@ -90,11 +91,11 @@ func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
 		"INSERT INTO `address`(`address`, `count`, `region`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	_, err = stmt.Exec(pop.Address, pop.Count, pop.Region, pop.Count)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
 	sg.Done()
 }
