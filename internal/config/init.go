@@ -16,9 +16,13 @@ var (
 	PublishAddress     string
 	RefreshInterval    int64
 	RefreshDelay       int64
+	RedisAddress       string
+	RedisPassword      string
+	RedisDatabase      int
 	CacheNamespacePop  string
 	CacheNamespaceGeo  string
 	CacheNamespaceRate string
+	MysqlDSN           string
 	ReCaptchaStatus    bool
 	JWTCaptchaSecret   []byte
 	JWTExpired         time.Duration
@@ -41,9 +45,18 @@ func init() {
 	}
 	RefreshDelay = int64(refreshDelayInt)
 
+	RedisAddress = Get(EnvRedisAddress)
+	RedisPassword = Get(EnvRedisPassword)
+	RedisDatabase, err = strconv.Atoi(Get(EnvRedisDatabase))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	CacheNamespacePop = Get(EnvRedisNamespacePop)
 	CacheNamespaceGeo = Get(EnvRedisNamespaceGeo)
 	CacheNamespaceRate = Get(EnvRedisNamespaceRate)
+
+	MysqlDSN = Get(EnvMysqlDSN)
 
 	if secret := Get(EnvReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)

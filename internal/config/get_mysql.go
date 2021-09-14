@@ -11,7 +11,7 @@ import (
 )
 
 func GetMySQL() *sql.DB {
-	mysql, err := sql.Open("mysql", Get(EnvMysqlDSN))
+	mysql, err := sql.Open("mysql", MysqlDSN)
 	if err != nil {
 		log.Panicln(err)
 	}
