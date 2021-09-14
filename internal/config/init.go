@@ -32,6 +32,16 @@ var (
 )
 
 func init() {
+	loadGeneral()
+	loadRedis()
+	loadMySQL()
+	loadRecaptcha()
+	loadJWT()
+	loadLimit()
+	loadFixRate()
+}
+
+func loadGeneral() {
 	PublishAddress = Get(EnvPublishAddress)
 
 	refreshIntervalInt, err := strconv.Atoi(Get(EnvRefreshInterval))
@@ -39,11 +49,16 @@ func init() {
 		log.Panicln(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
+
 	refreshDelayInt, err := strconv.Atoi(Get(EnvRefreshDelay))
 	if err != nil {
 		log.Panicln(err)
 	}
 	RefreshDelay = int64(refreshDelayInt)
+}
+
+func loadRedis() {
+	var err error
 
 	RedisAddress = Get(EnvRedisAddress)
 	RedisPassword = Get(EnvRedisPassword)
@@ -55,15 +70,23 @@ func init() {
 	CacheNamespacePop = Get(EnvRedisNamespacePop)
 	CacheNamespaceGeo = Get(EnvRedisNamespaceGeo)
 	CacheNamespaceRate = Get(EnvRedisNamespaceRate)
+}
 
+func loadMySQL() {
 	MysqlDSN = Get(EnvMysqlDSN)
+}
 
+func loadRecaptcha() {
 	if secret := Get(EnvReCaptchaSecret); secret != "" {
 		recaptcha.Init(secret)
 		ReCaptchaStatus = true
 	} else {
 		ReCaptchaStatus = false
 	}
+}
+
+func loadJWT() {
+	var err error
 
 	if secret := Get(EnvJWTSecret); secret != "" {
 		JWTCaptchaSecret = []byte(secret)
@@ -80,6 +103,10 @@ func init() {
 		log.Panicln(err)
 	}
 	JWTExpired = time.Duration(jwtExpired)
+}
+
+func loadLimit() {
+	var err error
 
 	PopLimit, err = strconv.Atoi(Get(EnvPopLimit))
 	if err != nil {
@@ -89,7 +116,9 @@ func init() {
 	if err != nil {
 		log.Panicln(err)
 	}
+}
 
+func loadFixRate() {
 	if Get(EnvForceFixRate) == "yes" {
 		ForceFixRate = true
 	} else {
