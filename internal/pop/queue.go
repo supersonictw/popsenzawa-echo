@@ -79,6 +79,12 @@ func updateRegionPop(sg *sync.WaitGroup, pop *Pop) {
 	stmt, err := mysqlClient.Prepare(
 		"INSERT INTO `region`(`code`, `count`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
+	defer func() {
+		err := stmt.Close()
+		if err != nil {
+			log.Panicln(err)
+		}
+	}()
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -93,6 +99,12 @@ func updateAddressPop(sg *sync.WaitGroup, pop *Pop) {
 	stmt, err := mysqlClient.Prepare(
 		"INSERT INTO `address`(`address`, `count`, `region`) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE `count` = `count` + ?",
 	)
+	defer func() {
+		err := stmt.Close()
+		if err != nil {
+			log.Panicln(err)
+		}
+	}()
 	if err != nil {
 		log.Panicln(err)
 	}

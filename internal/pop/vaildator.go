@@ -89,6 +89,9 @@ func ValidateJWT(c *gin.Context, token string) (bool, error) {
 }
 
 func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
+	if gin.Mode() != gin.ReleaseMode {
+		return "##", nil
+	}
 	if value := queryRegionCodeFromRedis(ctx, ipAddress); value != "" {
 		return value, nil
 	}
