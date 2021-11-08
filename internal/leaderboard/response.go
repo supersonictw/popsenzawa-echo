@@ -5,10 +5,9 @@ package leaderboard
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/gin-contrib/sse"
 	"github.com/gin-gonic/gin"
-	"github.com/r3labs/sse/v2"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"log"
 	"strconv"
@@ -16,30 +15,23 @@ import (
 )
 
 func Response(c *gin.Context) {
-	server := sse.New()
-	ctx, cancel := context.WithCancel(context.Background())
-	server.CreateStream("messages")
-	go listen(ctx, server)
-	server.HTTPHandler(c.Writer, c.Request)
-	cancel()
-	server.Close()
-}
-
-func listen(ctx context.Context, server *sse.Server) {
+	err := sse.Event{
+		Event: "handshake",
+		Data:  "This is PopCat Echo, ùwú.",
+	}.Render(c.Writer)
+	if err != nil {
+		log.Panicln(err)
+	}
+	ctx := context.Background()
 	for {
-		queryCtx := context.Background()
-		jsonBytes, err := json.Marshal(fetchRegionPopsFromRedis(queryCtx))
+		err := sse.Encode(c.Writer, sse.Event{
+			Event: "message",
+			Data:  fetchRegionPopsFromRedis(ctx),
+		})
 		if err != nil {
 			log.Panicln(err)
 		}
-		select {
-		case <-ctx.Done():
-			return
-		default:
-			server.Publish("messages", &sse.Event{
-				Data: jsonBytes,
-			})
-		}
+		c.Writer.Flush()
 		time.Sleep(time.Second)
 	}
 }
