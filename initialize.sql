@@ -12,16 +12,16 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `address`
 (
-    `address` varchar(128) NOT NULL,
-    `count`   bigint(20)   NOT NULL,
-    `region`  varchar(8)   NOT NULL
+    `address` varchar(128)        NOT NULL,
+    `count`   bigint(20) UNSIGNED NOT NULL,
+    `region`  varchar(8)          NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE `region`
 (
-    `code`  varchar(8) NOT NULL,
-    `count` bigint(20) NOT NULL
+    `code`  varchar(8)          NOT NULL,
+    `count` bigint(20) UNSIGNED NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
