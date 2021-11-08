@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"log"
+	"net"
 	"strconv"
 	"time"
 )
@@ -24,10 +25,13 @@ func Response(c *gin.Context) {
 	}
 	ctx := context.Background()
 	for {
-		err := sse.Encode(c.Writer, sse.Event{
+		err = sse.Encode(c.Writer, sse.Event{
 			Event: "message",
 			Data:  fetchRegionPopsFromRedis(ctx),
 		})
+		if status, ok := err.(*net.OpError); ok && status.Err.Error() == "write: broken pipe" {
+			return
+		}
 		if err != nil {
 			log.Panicln(err)
 		}
