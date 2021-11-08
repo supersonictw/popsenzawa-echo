@@ -36,6 +36,6 @@ func AppendAddressCountInRefreshInterval(ctx context.Context, address string, co
 		log.Panicln(err)
 	}
 	if previous == 0 {
-		redisClient.Expire(ctx, key, config.JWTExpired*time.Second)
+		redisClient.Expire(ctx, key, config.PopLimitRedisDuration*time.Second)
 	}
 }

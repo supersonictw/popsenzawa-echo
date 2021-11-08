@@ -1,7 +1,6 @@
 # PopCat Echo
 
-The server-side reproduction, similar the one of <https://popcat.click>,
-improve the performance and speed.
+The server-side reproduction, similar the one of <https://popcat.click>, improve the performance and speed.
 
 ## Docker Image
 

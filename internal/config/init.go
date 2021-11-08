@@ -13,44 +13,56 @@ import (
 )
 
 var (
-	PublishAddress     string
-	RefreshInterval    int64
-	RefreshDelay       int64
-	RedisAddress       string
-	RedisPassword      string
-	RedisDatabase      int
-	CacheNamespacePop  string
-	CacheNamespaceGeo  string
-	CacheNamespaceRate string
-	MysqlDSN           string
-	ReCaptchaStatus    bool
-	JWTCaptchaSecret   []byte
-	JWTExpired         time.Duration
-	PopLimit           int
-	RateLimit          int
-	ForceFixRate       bool
+	CORSSupport           bool
+	FrontendHostname      string
+	FrontendSSL           bool
+	PublishAddress        string
+	RefreshInterval       int64
+	RefreshDelay          int64
+	RedisAddress          string
+	RedisPassword         string
+	RedisDatabase         int
+	CacheNamespacePop     string
+	CacheNamespaceGeo     string
+	CacheNamespaceRate    string
+	MysqlDSN              string
+	PopReCaptchaStatus    bool
+	PopJWTSecret          []byte
+	PopJWTExpired         time.Duration
+	PopLimitHttpDuration  time.Duration
+	PopLimitHttpRequests  int
+	PopLimitRedisDuration time.Duration
+	PopLimitRedisPopCount int
+	ForceFixRate          bool
 )
 
 func init() {
 	loadGeneral()
 	loadRedis()
 	loadMySQL()
-	loadRecaptcha()
 	loadJWT()
+	loadRecaptcha()
 	loadLimit()
 	loadFixRate()
 }
 
 func loadGeneral() {
-	PublishAddress = Get(EnvPublishAddress)
-
-	refreshIntervalInt, err := strconv.Atoi(Get(EnvRefreshInterval))
+	// CORSSupport
+	CORSSupport = get(EnvCORSSupport) == "yes"
+	// FrontendHostname
+	FrontendHostname = get(EnvFrontendHostname)
+	// FrontendSSL
+	FrontendSSL = get(EnvFrontendSSL) == "yes"
+	// PublishAddress
+	PublishAddress = get(EnvPublishAddress)
+	// RefreshInterval
+	refreshIntervalInt, err := strconv.Atoi(get(EnvRefreshInterval))
 	if err != nil {
 		log.Panicln(err)
 	}
 	RefreshInterval = int64(refreshIntervalInt)
-
-	refreshDelayInt, err := strconv.Atoi(Get(EnvRefreshDelay))
+	// RefreshDelay
+	refreshDelayInt, err := strconv.Atoi(get(EnvRefreshDelay))
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -59,67 +71,87 @@ func loadGeneral() {
 
 func loadRedis() {
 	var err error
-
-	RedisAddress = Get(EnvRedisAddress)
-	RedisPassword = Get(EnvRedisPassword)
-	RedisDatabase, err = strconv.Atoi(Get(EnvRedisDatabase))
+	// RedisAddress
+	RedisAddress = get(EnvRedisAddress)
+	// RedisPassword
+	RedisPassword = get(EnvRedisPassword)
+	// RedisDatabase
+	RedisDatabase, err = strconv.Atoi(get(EnvRedisDatabase))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	CacheNamespacePop = Get(EnvRedisNamespacePop)
-	CacheNamespaceGeo = Get(EnvRedisNamespaceGeo)
-	CacheNamespaceRate = Get(EnvRedisNamespaceRate)
+	// CacheNamespacePop
+	CacheNamespacePop = get(EnvRedisNamespacePop)
+	// CacheNamespaceGeo
+	CacheNamespaceGeo = get(EnvRedisNamespaceGeo)
+	// CacheNamespaceRate
+	CacheNamespaceRate = get(EnvRedisNamespaceRate)
 }
 
 func loadMySQL() {
-	MysqlDSN = Get(EnvMysqlDSN)
-}
-
-func loadRecaptcha() {
-	if secret := Get(EnvReCaptchaSecret); secret != "" {
-		recaptcha.Init(secret)
-		ReCaptchaStatus = true
-	} else {
-		ReCaptchaStatus = false
-	}
+	// MysqlDSN
+	MysqlDSN = get(EnvMysqlDSN)
 }
 
 func loadJWT() {
 	var err error
-
-	if secret := Get(EnvJWTSecret); secret != "" {
-		JWTCaptchaSecret = []byte(secret)
+	// PopJWTSecret
+	if secret := get(EnvPopJWTSecret); secret != "" {
+		PopJWTSecret = []byte(secret)
 	} else {
 		blk := make([]byte, 32)
 		if _, err = rand.Read(blk); err != nil {
 			log.Panicln(err)
 		}
-		JWTCaptchaSecret = blk
+		PopJWTSecret = blk
 	}
-
-	jwtExpired, err := strconv.Atoi(Get(EnvJWTExpired))
+	// PopJWTExpired
+	jwtExpired, err := strconv.Atoi(get(EnvPopJWTExpired))
 	if err != nil {
 		log.Panicln(err)
 	}
-	JWTExpired = time.Duration(jwtExpired)
+	PopJWTExpired = time.Duration(jwtExpired)
+}
+
+func loadRecaptcha() {
+	// PopReCaptchaStatus
+	if secret := get(EnvPopReCaptchaSecret); secret != "" {
+		recaptcha.Init(secret)
+		PopReCaptchaStatus = true
+	} else {
+		PopReCaptchaStatus = false
+	}
 }
 
 func loadLimit() {
 	var err error
-
-	PopLimit, err = strconv.Atoi(Get(EnvPopLimit))
+	// PopLimitHttpDuration
+	popLimitHttpDuration, err := strconv.Atoi(get(EnvPopLimitHttpDuration))
 	if err != nil {
 		log.Panicln(err)
 	}
-	RateLimit, err = strconv.Atoi(Get(EnvRateLimit))
+	PopLimitHttpDuration = time.Duration(popLimitHttpDuration)
+	// PopLimitHttpRequests
+	PopLimitHttpRequests, err = strconv.Atoi(get(EnvPopLimitHttpRequests))
+	if err != nil {
+		log.Panicln(err)
+	}
+	// PopLimitRedisDuration
+	popLimitRedisDuration, err := strconv.Atoi(get(EnvPopLimitRedisDuration))
+	if err != nil {
+		log.Panicln(err)
+	}
+	PopLimitRedisDuration = time.Duration(popLimitRedisDuration)
+	// PopLimitRedisPopCount
+	PopLimitRedisPopCount, err = strconv.Atoi(get(EnvPopLimitRedisPopCount))
 	if err != nil {
 		log.Panicln(err)
 	}
 }
 
 func loadFixRate() {
-	if Get(EnvForceFixRate) == "yes" {
+	// ForceFixRate
+	if get(EnvForceFixRate) == "yes" {
 		ForceFixRate = true
 	} else {
 		ForceFixRate = false

@@ -21,14 +21,14 @@ import (
 )
 
 func ValidateRange(count int) error {
-	if count >= 0 && count <= config.PopLimit {
+	if count >= 0 && count <= config.PopLimitRedisPopCount {
 		return nil
 	}
 	return EchoError.NewError(EchoError.InvalidCountRange)
 }
 
 func getJWTIssuer(c *gin.Context) string {
-	secret := append([]byte(c.Request.Host), config.JWTCaptchaSecret...)
+	secret := append([]byte(c.Request.Host), config.PopJWTSecret...)
 	hash := sha256.Sum256(secret)
 	return fmt.Sprintf("%x", hash)
 }
@@ -43,7 +43,7 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 	}
 	claims := jwt.StandardClaims{
 		Audience:  ipAddress,
-		ExpiresAt: now.Add(config.JWTExpired * time.Second).Unix(),
+		ExpiresAt: now.Add(config.PopJWTExpired * time.Second).Unix(),
 		Id:        uuid.NewString(),
 		IssuedAt:  now.Unix(),
 		Issuer:    issuer,
@@ -51,11 +51,11 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 		Subject:   regionCode,
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return tokenClaims.SignedString(config.JWTCaptchaSecret)
+	return tokenClaims.SignedString(config.PopJWTSecret)
 }
 
 func ValidateCaptcha(ipAddress string, token string) error {
-	if !config.ReCaptchaStatus {
+	if !config.PopReCaptchaStatus {
 		return nil
 	}
 	if token == "" {
@@ -76,7 +76,7 @@ func ValidateJWT(c *gin.Context, token string) (bool, error) {
 		token,
 		&jwt.StandardClaims{},
 		func(token *jwt.Token) (i interface{}, err error) {
-			return config.JWTCaptchaSecret, nil
+			return config.PopJWTSecret, nil
 		},
 	)
 	if err != nil {
@@ -132,11 +132,11 @@ func queryRegionCodeFromAPI(ipAddress string) string {
 }
 
 func ValidateAddressRate(ctx context.Context, address string) error {
-	if config.RateLimit == 0 {
+	if config.PopLimitRedisDuration == 0 {
 		return nil
 	}
 	sum := GetAddressCountInRefreshInterval(ctx, address)
-	if sum > config.RateLimit {
+	if sum > config.PopLimitRedisPopCount {
 		return EchoError.NewError(EchoError.AddressRateLimited)
 	}
 	return nil

@@ -14,12 +14,6 @@ import (
 	"net/http"
 )
 
-const (
-	EnvCORSSupport      config.EnvKey = "CORS_SUPPORT"
-	EnvFrontendHostname config.EnvKey = "FRONTEND_HOSTNAME"
-	EnvFrontendSSL      config.EnvKey = "FRONTEND_SSL"
-)
-
 func main() {
 	fmt.Println("PopCat Echo")
 	fmt.Println("===")
@@ -34,9 +28,9 @@ func main() {
 
 	r := gin.Default()
 
-	if config.Get(EnvCORSSupport) == "yes" {
+	if config.CORSSupport {
 		var frontendURI string
-		if hostname := config.Get(EnvFrontendHostname); config.Get(EnvFrontendSSL) == "yes" {
+		if hostname := config.FrontendHostname; config.FrontendSSL {
 			frontendURI = fmt.Sprintf("https://%s", hostname)
 		} else {
 			frontendURI = fmt.Sprintf("http://%s", hostname)
@@ -53,7 +47,12 @@ func main() {
 		})
 	})
 	r.GET("/leaderboard", leaderboard.Response)
-	r.POST("/pop", pop.Response)
+
+	if config.PopLimitHttpDuration == 0 {
+		r.POST("/pop", pop.Response)
+	} else {
+		r.POST("/pop", pop.GetHttpLimiter(), pop.Response)
+	}
 
 	fmt.Println("Start")
 	err := r.Run(config.PublishAddress)
