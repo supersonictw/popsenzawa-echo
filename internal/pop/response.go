@@ -35,7 +35,7 @@ func Response(c *gin.Context) {
 		return
 	}
 
-	if status, err := ValidateJWT(c, token); !status {
+	if status, err := ValidateJWT(c, ctx, token); !status {
 		var message string
 		if raised, ok := err.(*jwt.ValidationError); ok {
 			log.Println(raised)

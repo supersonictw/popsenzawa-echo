@@ -71,7 +71,7 @@ func ValidateCaptcha(ipAddress string, token string) error {
 	return err
 }
 
-func ValidateJWT(c *gin.Context, token string) (bool, error) {
+func ValidateJWT(c *gin.Context, ctx context.Context, token string) (bool, error) {
 	tokenClaims, err := jwt.ParseWithClaims(
 		token,
 		&jwt.StandardClaims{},
@@ -83,7 +83,15 @@ func ValidateJWT(c *gin.Context, token string) (bool, error) {
 		return false, err
 	}
 	if claims, ok := tokenClaims.Claims.(*jwt.StandardClaims); ok && tokenClaims.Valid {
-		return claims.Issuer == getJWTIssuer(c), nil
+		ipAddress := c.ClientIP()
+		issuer := getJWTIssuer(c)
+		regionCode, err := GetRegionCode(ctx, ipAddress)
+		if err != nil {
+			return false, err
+		}
+		return claims.Issuer == issuer &&
+			claims.Subject == regionCode &&
+			claims.Audience == ipAddress, nil
 	}
 	return false, nil
 }
