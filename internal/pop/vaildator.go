@@ -33,14 +33,8 @@ func getJWTIssuer(c *gin.Context) string {
 	return fmt.Sprintf("%x", hash)
 }
 
-func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
+func IssueJWT(issuer, ipAddress, regionCode string) (string, error) {
 	now := time.Now()
-	ipAddress := c.ClientIP()
-	issuer := getJWTIssuer(c)
-	regionCode, err := GetRegionCode(ctx, ipAddress)
-	if err != nil {
-		return "", err
-	}
 	claims := jwt.StandardClaims{
 		Audience:  ipAddress,
 		ExpiresAt: now.Add(config.PopJWTExpired * time.Second).Unix(),
@@ -54,7 +48,7 @@ func IssueJWT(c *gin.Context, ctx context.Context) (string, error) {
 	return tokenClaims.SignedString(config.PopJWTSecret)
 }
 
-func ValidateCaptcha(ipAddress string, token string) error {
+func ValidateCaptcha(ipAddress, token string) error {
 	if !config.PopReCaptchaStatus {
 		return nil
 	}
@@ -71,7 +65,7 @@ func ValidateCaptcha(ipAddress string, token string) error {
 	return err
 }
 
-func ValidateJWT(c *gin.Context, ctx context.Context, token string) (bool, error) {
+func ValidateJWT(c *gin.Context, ctx context.Context, token string) (bool, *jwt.StandardClaims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(
 		token,
 		&jwt.StandardClaims{},
@@ -80,20 +74,20 @@ func ValidateJWT(c *gin.Context, ctx context.Context, token string) (bool, error
 		},
 	)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 	if claims, ok := tokenClaims.Claims.(*jwt.StandardClaims); ok && tokenClaims.Valid {
 		ipAddress := c.ClientIP()
 		issuer := getJWTIssuer(c)
 		regionCode, err := GetRegionCode(ctx, ipAddress)
 		if err != nil {
-			return false, err
+			return false, nil, err
 		}
 		return claims.Issuer == issuer &&
 			claims.Subject == regionCode &&
-			claims.Audience == ipAddress, nil
+			claims.Audience == ipAddress, claims, nil
 	}
-	return false, nil
+	return false, nil, nil
 }
 
 func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {

@@ -17,11 +17,13 @@ import (
 
 func Response(c *gin.Context) {
 	ctx := context.Background()
-	token := c.Query("token")
-	ipAddress := c.ClientIP()
 
+	token := c.Query("token")
 	if token == "" {
-		newToken, err := IssueJWT(c, ctx)
+		ipAddress := c.ClientIP()
+		issuer := getJWTIssuer(c)
+		regionCode, err := GetRegionCode(ctx, ipAddress)
+		newToken, err := IssueJWT(issuer, ipAddress, regionCode)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"new_token": newToken,
@@ -35,7 +37,8 @@ func Response(c *gin.Context) {
 		return
 	}
 
-	if status, err := ValidateJWT(c, ctx, token); !status {
+	jwtStatus, jwtClaims, err := ValidateJWT(c, ctx, token)
+	if !jwtStatus {
 		var message string
 		if raised, ok := err.(*jwt.ValidationError); ok {
 			log.Println(raised)
@@ -53,6 +56,10 @@ func Response(c *gin.Context) {
 		})
 		return
 	}
+
+	issuer := jwtClaims.Issuer
+	ipAddress := jwtClaims.Audience
+	regionCode := jwtClaims.Subject
 
 	captchaToken := c.Query("captcha_token")
 	if err := ValidateCaptcha(ipAddress, captchaToken); err != nil {
@@ -86,7 +93,7 @@ func Response(c *gin.Context) {
 		return
 	}
 	if count == 0 {
-		newToken, err := IssueJWT(c, ctx)
+		newToken, err := IssueJWT(issuer, ipAddress, regionCode)
 		if err == nil {
 			c.JSON(http.StatusOK, gin.H{
 				"new_token": newToken,
@@ -97,15 +104,6 @@ func Response(c *gin.Context) {
 				"message": err.Error(),
 			})
 		}
-		return
-	}
-
-	regionCode, err := GetRegionCode(ctx, ipAddress)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
 		return
 	}
 
@@ -122,7 +120,7 @@ func Response(c *gin.Context) {
 	go AppendRegionCount(ctx, regionCode, pop.Count)
 	go AppendAddressCountInRefreshInterval(ctx, ipAddress, pop.Count)
 
-	newToken, err := IssueJWT(c, ctx)
+	newToken, err := IssueJWT(issuer, ipAddress, regionCode)
 	if err == nil {
 		c.JSON(http.StatusCreated, gin.H{
 			"new_token": newToken,
