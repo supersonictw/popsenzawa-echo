@@ -8,33 +8,24 @@ import (
 	"fmt"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"log"
-	"strconv"
 )
 
 func GetGlobalCount(ctx context.Context) int {
 	key := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "global")
-	sumString := redisClient.Get(ctx, key).Val()
-	if sumString == "" {
-		return 0
-	}
-	sum, err := strconv.Atoi(sumString)
+	value, err := redisClient.Get(ctx, key).Int()
 	if err != nil {
 		log.Panicln(err)
 	}
-	return sum
+	return value
 }
 
 func GetRegionCount(ctx context.Context, region string) int {
 	key := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "regions")
-	sumString := redisClient.HGet(ctx, key, region).Val()
-	if sumString == "" {
-		return 0
-	}
-	sum, err := strconv.Atoi(sumString)
+	value, err := redisClient.HGet(ctx, key, region).Int()
 	if err != nil {
 		log.Panicln(err)
 	}
-	return sum
+	return value
 }
 
 func AppendRegionCount(ctx context.Context, region string, count int) {

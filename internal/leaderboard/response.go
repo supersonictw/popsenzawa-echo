@@ -59,13 +59,12 @@ func PrepareCache() {
 
 func fetchRegionPopsFromRedis(ctx context.Context) map[string]interface{} {
 	keyGlobal := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "global")
-	resultGlobal := redisClient.Get(ctx, keyGlobal).Val()
 	keyRegions := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "regions")
-	resultRegions := redisClient.HGetAll(ctx, keyRegions).Val()
-	sumGlobal, err := strconv.Atoi(resultGlobal)
+	sumGlobal, err := redisClient.Get(ctx, keyGlobal).Int()
 	if err != nil {
 		log.Panicln(err)
 	}
+	resultRegions := redisClient.HGetAll(ctx, keyRegions).Val()
 	sumRegions := make(map[string]int, len(resultRegions))
 	for i, region := range resultRegions {
 		sumRegions[i], err = strconv.Atoi(region)
