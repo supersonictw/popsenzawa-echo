@@ -5,7 +5,9 @@ package pop
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/supersonictw/popcat-echo/internal/config"
 	"log"
 )
@@ -13,7 +15,7 @@ import (
 func GetGlobalCount(ctx context.Context) int {
 	key := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "global")
 	value, err := redisClient.Get(ctx, key).Int()
-	if err != nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		log.Panicln(err)
 	}
 	return value
@@ -22,7 +24,7 @@ func GetGlobalCount(ctx context.Context) int {
 func GetRegionCount(ctx context.Context, region string) int {
 	key := fmt.Sprintf("%s:%s", config.CacheNamespacePop, "regions")
 	value, err := redisClient.HGet(ctx, key, region).Int()
-	if err != nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		log.Panicln(err)
 	}
 	return value
