@@ -24,7 +24,7 @@ func ValidateRange(count int) error {
 	if count >= 0 && count <= config.PopLimitRedisPopCount {
 		return nil
 	}
-	return EchoError.NewError(EchoError.InvalidCountRange)
+	return EchoError.InvalidCountRange
 }
 
 func getJWTIssuer(c *gin.Context) string {
@@ -53,14 +53,14 @@ func ValidateCaptcha(ipAddress, token string) error {
 		return nil
 	}
 	if token == "" {
-		return EchoError.NewError(EchoError.EmptyCaptchaToken)
+		return EchoError.EmptyCaptchaToken
 	}
 	result, err := recaptcha.Confirm(ipAddress, token)
 	if err != nil {
 		return err
 	}
 	if !result {
-		return EchoError.NewError(EchoError.UnsafeCaptchaToken)
+		return EchoError.UnsafeCaptchaToken
 	}
 	return err
 }
@@ -106,7 +106,7 @@ func GetRegionCode(ctx context.Context, ipAddress string) (string, error) {
 		}
 		return value, nil
 	}
-	return "", EchoError.NewError(EchoError.UnknownRegionCode)
+	return "", EchoError.UnknownRegionCode
 }
 
 func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
@@ -139,7 +139,7 @@ func ValidateAddressRate(ctx context.Context, address string) error {
 	}
 	sum := GetAddressCountInRefreshInterval(ctx, address)
 	if sum > config.PopLimitRedisPopCount {
-		return EchoError.NewError(EchoError.AddressRateLimited)
+		return EchoError.AddressRateLimited
 	}
 	return nil
 }

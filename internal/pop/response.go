@@ -47,7 +47,7 @@ func Response(c *gin.Context) {
 			log.Println(err)
 			message = err.Error()
 		} else {
-			err := EchoError.NewError(EchoError.UnknownJWTError)
+			err := EchoError.UnknownJWTError
 			log.Println(err)
 			message = err.Error()
 		}
