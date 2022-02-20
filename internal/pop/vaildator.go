@@ -115,7 +115,7 @@ func queryRegionCodeFromRedis(ctx context.Context, ipAddress string) string {
 }
 
 func queryRegionCodeFromAPI(ipAddress string) string {
-	resp, err := http.Get("https://restapi.starinc.xyz/basic/ip/geo?ip_addr=" + ipAddress)
+	resp, err := http.Get("https://restapi.starinc.xyz/basic/network/ip/geo?ip_addr=" + ipAddress)
 	if err != nil {
 		log.Panicln(err)
 	}
