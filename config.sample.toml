@@ -1,0 +1,11 @@
+[server]
+host = "127.0.0.1"
+port = 8000
+
+[database]
+mysql_dsn = "popcat_echo:example@tcp(localhost)/popcat_echo"
+geolite2_path = "/tmp/ip_geo.mmdb"
+
+[pop_rules]
+jwt_secret = "example_secret"
+recaptcha_secret = "example_secret"

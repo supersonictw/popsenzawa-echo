@@ -5,36 +5,36 @@ package data
 
 import (
 	"log"
-	"os"
 
 	"github.com/oschwald/maxminddb-golang"
+	"github.com/spf13/viper"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var (
-	envMySQLDSN  string
-	envIPGeoPath string
+	configMySQLDSN  string
+	configIPGeoPath string
 
 	Database      *gorm.DB
 	IPGeoDatabase *maxminddb.Reader
 )
 
 func init() {
-	envMySQLDSN = os.Getenv("MYSQL_DSN")
-	envIPGeoPath = os.Getenv("IP_GEO_PATH")
+	configMySQLDSN = viper.Get("MYSQL_DSN").(string)
+	configIPGeoPath = viper.Get("IP_GEO_PATH").(string)
 }
 
 func init() {
 	var err error
 
-	Database, err = gorm.Open(mysql.Open(envMySQLDSN), &gorm.Config{})
+	Database, err = gorm.Open(mysql.Open(configMySQLDSN), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect database")
 	}
 
-	IPGeoDatabase, err = maxminddb.Open(envIPGeoPath)
+	IPGeoDatabase, err = maxminddb.Open(configIPGeoPath)
 	if err != nil {
 		log.Fatal(err)
 	}

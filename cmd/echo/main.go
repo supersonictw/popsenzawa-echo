@@ -7,19 +7,23 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"github.com/supersonictw/popcat-echo/leaderboard"
 	"github.com/supersonictw/popcat-echo/pop"
 )
 
 var (
-	envPublishAddress string
+	configPublishAddress string
 )
 
 func init() {
-	envPublishAddress = os.Getenv("PUBLISH_ADDRESS")
+
+}
+
+func init() {
+	configPublishAddress = viper.Get("PUBLISH_ADDRESS").(string)
 }
 
 func main() {
@@ -42,7 +46,7 @@ func main() {
 	r.POST("/pops", pop.PostPops)
 
 	fmt.Println("Start Echo Server")
-	if err := r.Run(envPublishAddress); err != nil {
+	if err := r.Run(configPublishAddress); err != nil {
 		log.Fatal(err)
 	}
 }
