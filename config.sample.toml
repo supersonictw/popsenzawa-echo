@@ -1,6 +1,11 @@
 [server]
 address = "127.0.0.1:8000"
 
+[cors]
+allow_origins = [
+    "http://localhost:3000",
+]
+
 [mysql]
 dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
 

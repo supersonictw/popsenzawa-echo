@@ -30,15 +30,22 @@ func main() {
 	fmt.Println()
 
 	r := gin.Default()
+	if len(allowOrigins) > 0 {
+		cors := getCORS()
+		r.Use(cors)
+	}
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"application": "popsenzawa-echo",
 			"copyright":   "(c)2023 SuperSonic(https://github.com/supersonictw)",
 		})
 	})
+
 	r.GET("/leaderboard",
 		leaderboard.GetLeaderboard,
 	)
+
 	r.POST("/pops",
 		pop.MiddlewareParseJwt,
 		pop.MiddlewareCheckRecaptcha,
@@ -47,7 +54,7 @@ func main() {
 		pop.PostPops,
 	)
 
-	fmt.Println("Start Echo Server")
+	log.Println("echo-server startup successfully!")
 	if err := r.Run(serverAddress); err != nil {
 		log.Fatal(err)
 	}
