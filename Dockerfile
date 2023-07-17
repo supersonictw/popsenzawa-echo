@@ -2,14 +2,14 @@
 # (c) 2023 SuperSonic (https://github.com/supersonictw).
 
 FROM golang:alpine AS builder
-COPY . /builder
-RUN cd /builder \
+COPY . /workplace
+RUN cd /workplace \
     && go build ./cmd/echo \
     && go clean -cache
 
 FROM alpine:latest
 ENV GIN_MODE release
-COPY --from=builder /builder/build/echo /app/echo
-WORKDIR /app
-ENTRYPOINT /app/echo
+COPY --from=builder /workplace/build/echo /workplace/echo
+WORKDIR /workplace
+ENTRYPOINT /workplace/echo
 EXPOSE 8000

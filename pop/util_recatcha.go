@@ -16,7 +16,7 @@ var (
 )
 
 var (
-	recaptchaSecret = viper.GetString("pop_rules.recaptcha_secret")
+	recaptchaSecret = viper.GetString("recaptcha.secret")
 )
 
 func init() {

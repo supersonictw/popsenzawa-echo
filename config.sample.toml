@@ -12,6 +12,12 @@ network = "tcp"
 address = "127.0.0.1:6379"
 database = 0
 
-[pop_rules]
-jwt_secret = "popsenzawa_echo"
-recaptcha_secret = "popsenzawa_echo"
+[jwt]
+secret = "popsenzawa_echo"
+
+[recaptcha]
+secret = "popsenzawa_echo"
+
+[rate_limit]
+max_request_per_second = 10
+default_expiration_ttl = 10

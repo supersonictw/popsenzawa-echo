@@ -24,7 +24,7 @@ var (
 
 var (
 	serverAddress      = viper.GetString("server.address")
-	popJwtSecretString = viper.GetString("pop_rules.jwt_secret")
+	popJwtSecretString = viper.GetString("jwt.secret")
 	popJwtSecretBytes  = []byte(popJwtSecretString)
 )
 

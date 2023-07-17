@@ -4,22 +4,15 @@
 package pop
 
 import (
-	"context"
-	"net/http"
-
+	"github.com/didip/tollbooth_gin"
 	"github.com/gin-gonic/gin"
 )
 
-func MiddlewareCheckRateLimit(c *gin.Context) {
-	ipAddress := c.ClientIP()
+var (
+	MiddlewareCheckRateLimit gin.HandlerFunc
+)
 
-	ctx := context.Background()
-	if err := ValidateRateLimitIpAddress(ctx, ipAddress); err != nil {
-		c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
-
-	c.Next()
+func init() {
+	filter := GetRateLimitFilter()
+	MiddlewareCheckRateLimit = tollbooth_gin.LimitHandler(filter)
 }
