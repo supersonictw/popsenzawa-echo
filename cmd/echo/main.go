@@ -1,52 +1,54 @@
-// PopCat Echo
+// PopSenzawa Echo
 // (c) 2023 SuperSonic (https://github.com/supersonictw).
 
 package main
 
 import (
+	_ "github.com/supersonictw/popsenzawa-echo/config"
+
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"github.com/supersonictw/popcat-echo/leaderboard"
-	"github.com/supersonictw/popcat-echo/pop"
+	"github.com/supersonictw/popsenzawa-echo/leaderboard"
+	"github.com/supersonictw/popsenzawa-echo/pop"
 )
 
 var (
-	configPublishAddress string
+	serverAddress = viper.GetString("server.address")
 )
 
-func init() {
-
-}
-
-func init() {
-	configPublishAddress = viper.Get("PUBLISH_ADDRESS").(string)
-}
-
 func main() {
-	fmt.Println("PopCat Echo")
+	fmt.Println("PopSenzawa Echo")
 	fmt.Println("===")
 	fmt.Println("The server reproduce of https://popcat.click with improvement.")
 	fmt.Println("License: MIT LICENSE")
-	fmt.Println("Repository: https://github.com/supersonictw/popcat-echo")
+	fmt.Println("Repository: https://github.com/supersonictw/popsenzawa-echo")
 	fmt.Println("(c) 2023 SuperSonic. https://github.com/supersonictw")
 	fmt.Println()
 
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"application": "popcat-echo",
+			"application": "popsenzawa-echo",
 			"copyright":   "(c)2023 SuperSonic(https://github.com/supersonictw)",
 		})
 	})
-	r.GET("/leaderboard", leaderboard.GetLeaderboard)
-	r.POST("/pops", pop.PostPops)
+	r.GET("/leaderboard",
+		leaderboard.GetLeaderboard,
+	)
+	r.POST("/pops",
+		pop.MiddlewareParseJwt,
+		pop.MiddlewareCheckRecaptcha,
+		pop.MiddlewareCheckRateLimit,
+		pop.MiddlewareParseCount,
+		pop.PostPops,
+	)
 
 	fmt.Println("Start Echo Server")
-	if err := r.Run(configPublishAddress); err != nil {
+	if err := r.Run(serverAddress); err != nil {
 		log.Fatal(err)
 	}
 }

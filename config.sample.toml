@@ -1,11 +1,17 @@
 [server]
-host = "127.0.0.1"
-port = 8000
+address = "127.0.0.1:8000"
 
-[database]
-mysql_dsn = "popcat_echo:example@tcp(localhost)/popcat_echo"
-geolite2_path = "/tmp/ip_geo.mmdb"
+[mysql]
+dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
+
+[geolite2]
+database_path = "/tmp/ip_geo.mmdb"
+
+[redis]
+network = "tcp"
+address = "127.0.0.1:6379"
+database = 0
 
 [pop_rules]
-jwt_secret = "example_secret"
-recaptcha_secret = "example_secret"
+jwt_secret = "popsenzawa_echo"
+recaptcha_secret = "popsenzawa_echo"

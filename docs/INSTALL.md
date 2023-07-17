@@ -6,10 +6,10 @@ Not sure if this is the best format for submitting a minimal setup guide, if @su
 
 ### Required docker images:
 
-Popcat server require redis for cache and mysql for stats aggregation so you will these image other than the popcat image.
+PopSenzawa server require redis for cache and mysql for stats aggregation so you will these image other than the popsenzawa image.
 
 ```
-docker pull supersonictw/popcat-echo
+docker pull supersonictw/popsenzawa-echo
 docker pull redis
 docker pull mysql:5.7
 ```
@@ -25,7 +25,7 @@ Use the initialize.sql script to setup your MYSQL database schema. You may need 
 
 ## Execute image
 
-Setup docker environment variable file according to [.env.sample](https://github.com/supersonictw/popcat-echo/blob/main/.env.sample)
+Setup docker environment variable file according to [.env.sample](https://github.com/supersonictw/popsenzawa-echo/blob/main/.env.sample)
 
 I find this DSN format working under my own setup ( under Linux environment you will need to change docker.for.mac.localhost to the docker IP )
 
@@ -33,10 +33,10 @@ I find this DSN format working under my own setup ( under Linux environment you 
 MYSQL_DSN=<mysql user>:<password>@tcp(docker.for.mac.localhost:3306)/<your database name>?charset=utf8
 ```
 
-Execute popcat server
+Execute popsenzawa server
 
 ```
-docker run -p 8013:8013 --env-file <your environment variable file> supersonictw/popcat-echo
+docker run -p 8013:8013 --env-file <your environment variable file> supersonictw/popsenzawa-echo
 ```
 
-You should be able to access popcat server at localhost:8013 !
+You should be able to access popsenzawa server at localhost:8013 !

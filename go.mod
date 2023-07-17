@@ -1,4 +1,4 @@
-module github.com/supersonictw/popcat-echo
+module github.com/supersonictw/popsenzawa-echo
 
 go 1.19
 
@@ -12,6 +12,25 @@ require (
 )
 
 require (
+	github.com/adjust/rmq v1.0.0 // indirect
+	github.com/adjust/uniuri v0.0.0-20130923163420-498743145e60 // indirect
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
+	github.com/dpapathanasiou/go-recaptcha v0.0.0-20190121160230-be5090b17804 // indirect
+	github.com/go-redis/redis/v8 v8.3.2 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
+	go.opentelemetry.io/otel v0.13.0 // indirect
+	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	gopkg.in/bsm/ratelimit.v1 v1.0.0-20170922094635-f56db5e73a5e // indirect
+	gopkg.in/redis.v3 v3.6.4 // indirect
+)
+
+require (
+	github.com/adjust/rmq/v5 v5.1.1
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect

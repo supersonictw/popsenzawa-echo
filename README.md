@@ -1,4 +1,4 @@
-# PopCat Echo
+# PopSenzawa Echo
 
 The server-side reproduction, similar the one of <https://popcat.click>, improve the performance and speed.
 
@@ -6,21 +6,21 @@ The server-side reproduction, similar the one of <https://popcat.click>, improve
 
 The docker image is available on:
 
-<https://hub.docker.com/r/supersonictw/popcat-echo>
+<https://hub.docker.com/r/supersonictw/popsenzawa-echo>
 
 ## Installation
 
-<https://github.com/supersonictw/popcat-echo/issues/1>
+<https://github.com/supersonictw/popsenzawa-echo/issues/1>
 
-<https://github.com/supersonictw/popcat-echo_deploy>
+<https://github.com/supersonictw/popsenzawa-echo_deploy>
 
 ## Web Client
 
-<https://github.com/supersonictw/popcat-active>
+<https://github.com/supersonictw/popsenzawa-active>
 
 ## Click BOT Simulator
 
-<https://github.com/supersonictw/popcat-delivery>
+<https://github.com/supersonictw/popsenzawa-delivery>
 
 ## Documentation
 
