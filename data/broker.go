@@ -61,8 +61,13 @@ func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
 	})
 }
 
-func BrokerOnUpdated(callback func(nextPop *BrokerNextPop)) {
+func BrokerOnUpdated(callback func(nextPop *BrokerNextPop), done <-chan struct{}) {
 	for nextPop := range nextPop {
-		callback(nextPop)
+		select {
+		case <-done:
+			return
+		default:
+			callback(nextPop)
+		}
 	}
 }

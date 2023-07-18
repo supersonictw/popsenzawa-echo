@@ -29,5 +29,5 @@ func GetLeaderboard(c *gin.Context) {
 		}); err != nil {
 			log.Panicln(err)
 		}
-	})
+	}, c.Done())
 }
