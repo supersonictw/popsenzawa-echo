@@ -12,15 +12,22 @@ import (
 
 func GetLeaderboard(c *gin.Context) {
 	sendMessage := useSendMessage(c)
-	sendResponse := func(globalSum int64, regionMap map[string]int64) {
-		if err := sendMessage(&Response{
-			Global:  globalSum,
-			Regions: regionMap,
+
+	data.BrokerOnConnected(func(initPop *data.BrokerInitPop) {
+		if err := sendMessage(&Message{
+			Type: MessageTypeInitPop,
+			Pops: initPop,
 		}); err != nil {
 			log.Panicln(err)
 		}
-	}
+	})
 
-	data.BrokerOnConnected(sendResponse)
-	data.BrokerOnUpdated(sendResponse)
+	data.BrokerOnUpdated(func(nextPop *data.BrokerNextPop) {
+		if err := sendMessage(&Message{
+			Type: MessageTypeNextPop,
+			Pops: nextPop,
+		}); err != nil {
+			log.Panicln(err)
+		}
+	})
 }

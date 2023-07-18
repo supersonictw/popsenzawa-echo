@@ -3,7 +3,14 @@
 
 package leaderboard
 
-type Response struct {
-	Global  int64            `json:"global"`
-	Regions map[string]int64 `json:"regions"`
+type MessageType string
+
+const (
+	MessageTypeInitPop MessageType = "init_pop"
+	MessageTypeNextPop MessageType = "next_pop"
+)
+
+type Message struct {
+	Type MessageType `json:"type"`
+	Pops any         `json:"pops"`
 }

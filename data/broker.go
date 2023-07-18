@@ -10,22 +10,44 @@ import (
 )
 
 type Broker struct {
-	GlobalSum int64
-	RegionMap map[string]int64
+	nextPop chan *BrokerNextPop
+}
 
-	next chan bool
+type BrokerInitPop struct {
+	GlobalSum int64            `json:"global_sum"`
+	RegionMap map[string]int64 `json:"region_map"`
+}
+
+type BrokerNextPop struct {
+	RegionCode  string `json:"region_code"`
+	CountAppend int64  `json:"count_append"`
 }
 
 func NewBroker() *Broker {
 	u := new(Broker)
-
-	regionSum := fetchRegionSum()
-	u.GlobalSum = regionSumToGlobal(regionSum)
-	u.RegionMap = regionSumToMap(regionSum)
-
-	u.next = make(chan bool, 1)
-
+	u.nextPop = make(chan *BrokerNextPop, 1)
 	return u
+}
+
+func (b *Broker) Consume(delivery rmq.Delivery) {
+	pop := new(VisitorPop)
+
+	if err := pop.FromMessageQueue(delivery); err != nil {
+		log.Println(err)
+		if err := delivery.Reject(); err != nil {
+			log.Println(err)
+		}
+		return
+	}
+
+	b.nextPop <- &BrokerNextPop{
+		RegionCode:  pop.RegionCode,
+		CountAppend: pop.Count,
+	}
+
+	if err := delivery.Ack(); err != nil {
+		log.Println(err)
+	}
 }
 
 func fetchRegionSum() []*RegionPop {
@@ -58,36 +80,18 @@ func regionSumToMap(regionSum []*RegionPop) map[string]int64 {
 	return regionMap
 }
 
-func (b *Broker) Consume(delivery rmq.Delivery) {
-	pop := new(VisitorPop)
-
-	if err := pop.FromMessageQueue(delivery); err != nil {
-		log.Println(err)
-		b.next <- false
-		if err := delivery.Reject(); err != nil {
-			log.Println(err)
-		}
-		return
-	}
-
-	b.GlobalSum += pop.Count
-	b.RegionMap[pop.RegionCode] += pop.Count
-
-	b.next <- true
-	if err := delivery.Ack(); err != nil {
-		log.Println(err)
-	}
+func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
+	regionSum := fetchRegionSum()
+	globalSum := regionSumToGlobal(regionSum)
+	regionMap := regionSumToMap(regionSum)
+	callback(&BrokerInitPop{
+		GlobalSum: globalSum,
+		RegionMap: regionMap,
+	})
 }
 
-func BrokerOnConnected(callback func(globalSum int64, regionMap map[string]int64)) {
-	callback(broker.GlobalSum, broker.RegionMap)
-}
-
-func BrokerOnUpdated(callback func(globalSum int64, regionMap map[string]int64)) {
-	for isNext := range broker.next {
-		if !isNext {
-			continue
-		}
-		callback(broker.GlobalSum, broker.RegionMap)
+func BrokerOnUpdated(callback func(nextPop *BrokerNextPop)) {
+	for nextPop := range broker.nextPop {
+		callback(nextPop)
 	}
 }

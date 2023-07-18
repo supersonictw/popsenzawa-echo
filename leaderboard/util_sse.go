@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func useSendMessage(c *gin.Context) func(response *Response) error {
+func useSendMessage(c *gin.Context) func(message *Message) error {
 	// Handshake
 	err := sse.Event{
 		Event: "handshake",
@@ -22,16 +22,16 @@ func useSendMessage(c *gin.Context) func(response *Response) error {
 	}
 
 	// Wrap real sendMessage
-	return func(response *Response) error {
-		return sendMessage(c, response)
+	return func(message *Message) error {
+		return sendMessage(c, message)
 	}
 }
 
-func sendMessage(c *gin.Context, response *Response) error {
+func sendMessage(c *gin.Context, message *Message) error {
 	// Send message
 	err := sse.Encode(c.Writer, sse.Event{
 		Event: "message",
-		Data:  response,
+		Data:  message,
 	})
 	if status, ok := err.(*net.OpError); ok &&
 		status.Err.Error() == "write: broken pipe" {
