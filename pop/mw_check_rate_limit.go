@@ -13,6 +13,6 @@ var (
 )
 
 func init() {
-	filter := GetRateLimitFilter()
-	MiddlewareCheckRateLimit = tollbooth_gin.LimitHandler(filter)
+	rateLimitFilter := getRateLimitFilter()
+	MiddlewareCheckRateLimit = tollbooth_gin.LimitHandler(rateLimitFilter)
 }

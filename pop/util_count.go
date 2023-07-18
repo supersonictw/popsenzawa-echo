@@ -20,7 +20,19 @@ var (
 	maxPopsAppendPerVisitor = viper.GetInt64("count.max_pops_append_per_visitor")
 )
 
-func ValidateRangeFromContext(c *gin.Context) (int64, error) {
+func validateRange(count int64) (int64, error) {
+	if count < 0 {
+		return 0, ErrCountInvalid
+	}
+
+	if count > maxPopsAppendPerVisitor {
+		count = maxPopsAppendPerVisitor
+	}
+
+	return count, nil
+}
+
+func validateRangeFromContext(c *gin.Context) (int64, error) {
 	countString := c.Query("count")
 	if countString == "" {
 		return 0, ErrCountEmpty
@@ -31,12 +43,5 @@ func ValidateRangeFromContext(c *gin.Context) (int64, error) {
 		return 0, err
 	}
 
-	if countInt64 < 0 {
-		return 0, ErrCountInvalid
-	}
-	if countInt64 > maxPopsAppendPerVisitor {
-		countInt64 = maxPopsAppendPerVisitor
-	}
-
-	return countInt64, nil
+	return validateRange(countInt64)
 }

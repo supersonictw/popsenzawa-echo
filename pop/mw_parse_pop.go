@@ -17,7 +17,7 @@ func MiddlewareParseCount(c *gin.Context) {
 	ipAddress := data.ParseVisitorIP(claims.Audience[0])
 	regionCode := claims.Subject
 
-	count, err := ValidateRangeFromContext(c)
+	count, err := validateRangeFromContext(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),

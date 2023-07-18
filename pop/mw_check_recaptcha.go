@@ -10,10 +10,7 @@ import (
 )
 
 func MiddlewareCheckRecaptcha(c *gin.Context) {
-	captchaToken := c.Query("captcha_token")
-	ipAddress := c.ClientIP()
-
-	if err := ValidateRecaptcha(ipAddress, captchaToken); err != nil {
+	if err := validateRecaptchaFromContext(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
 		})

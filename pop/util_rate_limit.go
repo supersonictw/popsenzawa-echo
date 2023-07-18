@@ -16,7 +16,7 @@ var (
 	defaultExpirationTTL = viper.GetFloat64("rate_limit.default_expiration_ttl")
 )
 
-func GetRateLimitFilter() *limiter.Limiter {
+func getRateLimitFilter() *limiter.Limiter {
 	filter := tollbooth.NewLimiter(maxRequestPerSecond, &limiter.ExpirableOptions{
 		DefaultExpirationTTL: time.Duration(defaultExpirationTTL) * time.Second,
 	})

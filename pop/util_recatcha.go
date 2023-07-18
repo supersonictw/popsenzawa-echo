@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/dpapathanasiou/go-recaptcha"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
 
@@ -23,7 +24,7 @@ func init() {
 	recaptcha.Init(recaptchaSecret)
 }
 
-func ValidateRecaptcha(ipAddress, token string) error {
+func validateRecaptcha(ipAddress, token string) error {
 	if recaptchaSecret == "" {
 		return nil
 	}
@@ -42,4 +43,11 @@ func ValidateRecaptcha(ipAddress, token string) error {
 	}
 
 	return err
+}
+
+func validateRecaptchaFromContext(c *gin.Context) error {
+	captchaToken := c.Query("captcha_token")
+	ipAddress := c.ClientIP()
+
+	return validateRecaptcha(captchaToken, ipAddress)
 }
