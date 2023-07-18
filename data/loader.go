@@ -12,13 +12,21 @@ const (
 )
 
 var (
-	uploader = NewUploader()
-	ticker   = time.NewTicker(1 * time.Second)
+	uploader *Uploader
+	broker   *Broker
+	ticker   *time.Ticker
 )
+
+func init() {
+	uploader = NewUploader()
+	broker = NewBroker()
+	ticker = time.NewTicker(1 * time.Second)
+}
 
 func init() {
 	MessageQueue.StartConsuming(unackedLimit, 5*time.Second)
 	MessageQueue.AddConsumer("uploader", uploader)
+	MessageQueue.AddConsumer("broker", broker)
 }
 
 func init() {

@@ -12,7 +12,7 @@ import (
 )
 
 type Uploader struct {
-	VisitorPopSum map[string]*VisitorPop
+	visitorPopSum map[string]*VisitorPop
 }
 
 func NewUploader() *Uploader {
@@ -33,10 +33,10 @@ func (u *Uploader) Consume(delivery rmq.Delivery) {
 	}
 
 	ipAddressString := pop.IPAddress.NetIP().String()
-	if u.VisitorPopSum[ipAddressString] == nil {
-		u.VisitorPopSum[ipAddressString] = pop
+	if u.visitorPopSum[ipAddressString] == nil {
+		u.visitorPopSum[ipAddressString] = pop
 	} else {
-		u.VisitorPopSum[ipAddressString].Count += pop.Count
+		u.visitorPopSum[ipAddressString].Count += pop.Count
 	}
 
 	if err := delivery.Ack(); err != nil {
@@ -50,13 +50,13 @@ func (u *Uploader) Wave() {
 }
 
 func (u Uploader) perform() {
-	for _, pop := range u.VisitorPopSum {
+	for _, pop := range u.visitorPopSum {
 		upload(pop)
 	}
 }
 
 func (u *Uploader) reset() {
-	u.VisitorPopSum = make(map[string]*VisitorPop)
+	u.visitorPopSum = make(map[string]*VisitorPop)
 }
 
 func upload(newPop *VisitorPop) {

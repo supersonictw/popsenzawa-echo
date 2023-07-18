@@ -5,25 +5,22 @@ package leaderboard
 
 import (
 	"log"
-	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/supersonictw/popsenzawa-echo/data"
 )
 
 func GetLeaderboard(c *gin.Context) {
 	sendMessage := useSendMessage(c)
-
-	for {
-		globalSum, regionSum := fetchPopsOverview()
-		regionMap := regionSumToMap(regionSum)
-
+	sendResponse := func(globalSum int64, regionMap map[string]int64) {
 		if err := sendMessage(&Response{
 			Global:  globalSum,
 			Regions: regionMap,
-		}); err == nil {
-			time.Sleep(time.Second)
-		} else {
+		}); err != nil {
 			log.Panicln(err)
 		}
 	}
+
+	data.BrokerOnConnected(sendResponse)
+	data.BrokerOnUpdated(sendResponse)
 }
