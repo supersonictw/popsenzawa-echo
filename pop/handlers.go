@@ -14,7 +14,7 @@ func PostPops(c *gin.Context) {
 	pop := c.MustGet("pop").(*data.VisitorPop)
 
 	if err := pop.Publish(); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
 	}

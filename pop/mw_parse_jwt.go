@@ -14,16 +14,16 @@ func MiddlewareParseJwt(c *gin.Context) {
 	if claims, err := validateJwtFromContext(c); errors.Is(err, ErrJwtEmpty) {
 		newToken, err := issueJwtFromContext(c)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
 			return
 		}
-		c.AbortWithStatusJSON(http.StatusOK, Response{
+		c.AbortWithStatusJSON(http.StatusCreated, Response{
 			NewToken: newToken,
 		})
 	} else if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"message": err.Error(),
 		})
 	} else {
