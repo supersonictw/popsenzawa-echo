@@ -62,12 +62,12 @@ func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
 }
 
 func BrokerOnUpdated(callback func(nextPop *BrokerNextPop), done <-chan struct{}) {
-	for nextPop := range nextPop {
+	for pop := range nextPop {
 		select {
 		case <-done:
 			return
 		default:
-			callback(nextPop)
+			callback(pop)
 		}
 	}
 }
