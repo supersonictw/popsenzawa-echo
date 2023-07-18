@@ -1,17 +1,15 @@
-# PopCat Echo
-# (c) 2021 SuperSonic (https://github.com/supersonictw).
+# PopSenzawa Echo
+# (c) 2023 SuperSonic (https://github.com/supersonictw).
 
-FROM golang:alpine
+FROM golang:alpine AS builder
+COPY . /workplace
+RUN cd /workplace \
+    && go build ./cmd/echo \
+    && go clean -cache
 
-WORKDIR /app
-ADD . /app
-
+FROM alpine:latest
 ENV GIN_MODE release
-ENV PUBLISH_ADDRESS ":8013"
-
-RUN cd /app/cmd/echo && go build
-RUN go clean -cache
-
-ENTRYPOINT /app/cmd/echo/echo
-
-EXPOSE 8013
+COPY --from=builder /workplace/build/echo /workplace/echo
+WORKDIR /workplace
+ENTRYPOINT /workplace/echo
+EXPOSE 8000

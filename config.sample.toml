@@ -1,0 +1,31 @@
+[server]
+address = "127.0.0.1:8000"
+
+[cors]
+allow_origins = [
+    "http://localhost:5173",
+]
+
+[mysql]
+dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
+
+[geolite2]
+database_path = "/tmp/ip_geo.mmdb"
+
+[redis]
+network = "tcp"
+address = "127.0.0.1:6379"
+database = 0
+
+[jwt]
+secret = "popsenzawa_echo"
+
+[recaptcha]
+secret = "popsenzawa_echo"
+
+[rate_limit]
+max_request_per_second = 10
+default_expiration_ttl = 10
+
+[count]
+max_pops_append_per_visitor = 800
