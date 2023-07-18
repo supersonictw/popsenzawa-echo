@@ -3,9 +3,9 @@
 
 FROM golang:alpine AS builder
 COPY . /workplace
-RUN cd /workplace \
-    && go build ./cmd/echo \
-    && go clean -cache
+WORKDIR /workplace
+RUN apk add --no-cache make
+RUN make && make clean-deps
 
 FROM alpine:latest
 ENV GIN_MODE release

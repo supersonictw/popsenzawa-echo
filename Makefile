@@ -8,8 +8,11 @@ echo:
 
 .PHONY: clean dev
 
-clean:
+clean: clean-deps
 	rm -rf $(WORKPLACE)/build
+
+clean-deps:
+	go clean -cache
 
 dev:
 	@go install github.com/cosmtrek/air@latest
