@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	nextPop = make(chan *BrokerNextPop, 1)
+	nextPop = make(chan *BrokerNextPop, configMessageQueuePrefetchLimit)
 )
 
 type BrokerInitPop struct {

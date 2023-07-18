@@ -12,11 +12,14 @@ import (
 var (
 	configMessageQueuePrefetchLimit = viper.GetInt64("message_queue.prefetcb_limit")
 	configMessageQueuePollDuration  = viper.GetFloat64("message_queue.poll_duration")
+	configMessageQueueWaveDuration  = viper.GetFloat64("message_queue.wave_duration")
 )
 
 var (
 	uploader = NewUploader()
-	ticker   = time.NewTicker(1 * time.Second)
+	ticker   = time.NewTicker(
+		time.Duration(configMessageQueueWaveDuration) * time.Second,
+	)
 )
 
 func init() {

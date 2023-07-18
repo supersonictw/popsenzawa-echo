@@ -7,6 +7,7 @@ allow_origins = ["http://localhost:5173"]
 [message_queue]
 prefetcb_limit = 1000
 poll_duration = 5
+wave_duration = 1
 
 [mysql]
 dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
