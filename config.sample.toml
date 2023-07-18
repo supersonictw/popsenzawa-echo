@@ -2,9 +2,11 @@
 address = "127.0.0.1:8000"
 
 [cors]
-allow_origins = [
-    "http://localhost:5173",
-]
+allow_origins = ["http://localhost:5173"]
+
+[message_queue]
+prefetcb_limit = 1000
+poll_duration = 5
 
 [mysql]
 dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"

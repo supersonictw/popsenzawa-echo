@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	allowOrigins = viper.GetStringSlice("cors.allow_origins")
+	configAllowOrigins = viper.GetStringSlice("cors.allow_origins")
 )
 
 func getCORS() gin.HandlerFunc {
 	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = allowOrigins
+	corsConfig.AllowOrigins = configAllowOrigins
 	return cors.New(corsConfig)
 }

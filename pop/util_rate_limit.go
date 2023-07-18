@@ -12,13 +12,13 @@ import (
 )
 
 var (
-	maxRequestPerSecond  = viper.GetFloat64("rate_limit.max_request_per_second")
-	defaultExpirationTTL = viper.GetFloat64("rate_limit.default_expiration_ttl")
+	configMaxRequestPerSecond  = viper.GetFloat64("rate_limit.max_request_per_second")
+	configDefaultExpirationTTL = viper.GetFloat64("rate_limit.default_expiration_ttl")
 )
 
 func getRateLimitFilter() *limiter.Limiter {
-	filter := tollbooth.NewLimiter(maxRequestPerSecond, &limiter.ExpirableOptions{
-		DefaultExpirationTTL: time.Duration(defaultExpirationTTL) * time.Second,
+	filter := tollbooth.NewLimiter(configMaxRequestPerSecond, &limiter.ExpirableOptions{
+		DefaultExpirationTTL: time.Duration(configDefaultExpirationTTL) * time.Second,
 	})
 
 	filter.SetIPLookups([]string{"RemoteAddr", "X-Forwarded-For", "X-Real-IP"})

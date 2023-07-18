@@ -5,10 +5,13 @@ package data
 
 import (
 	"time"
+
+	"github.com/spf13/viper"
 )
 
-const (
-	unackedLimit = 1000
+var (
+	configMessageQueuePrefetchLimit = viper.GetInt64("message_queue.prefetcb_limit")
+	configMessageQueuePollDuration  = viper.GetFloat64("message_queue.poll_duration")
 )
 
 var (
@@ -18,7 +21,10 @@ var (
 )
 
 func init() {
-	MessageQueue.StartConsuming(unackedLimit, 5*time.Second)
+	MessageQueue.StartConsuming(
+		configMessageQueuePrefetchLimit,
+		time.Duration(configMessageQueuePollDuration)*time.Second,
+	)
 	MessageQueue.AddConsumer("uploader", uploader)
 	MessageQueue.AddConsumer("broker", broker)
 }

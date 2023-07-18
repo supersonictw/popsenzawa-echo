@@ -17,15 +17,18 @@ var (
 )
 
 var (
-	recaptchaSecret = viper.GetString("recaptcha.secret")
+	configrecaptchaSecret = viper.GetString("recaptcha.secret")
 )
 
 func init() {
-	recaptcha.Init(recaptchaSecret)
+	if configrecaptchaSecret == "" {
+		return
+	}
+	recaptcha.Init(configrecaptchaSecret)
 }
 
 func validateRecaptcha(ipAddress, token string) error {
-	if recaptchaSecret == "" {
+	if configrecaptchaSecret == "" {
 		return nil
 	}
 

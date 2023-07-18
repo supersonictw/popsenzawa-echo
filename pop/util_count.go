@@ -17,7 +17,7 @@ var (
 )
 
 var (
-	maxPopsAppendPerVisitor = viper.GetInt64("count.max_pops_append_per_visitor")
+	configMaxPopsAppendPerVisitor = viper.GetInt64("count.max_pops_append_per_visitor")
 )
 
 func validateRange(count int64) (int64, error) {
@@ -25,8 +25,8 @@ func validateRange(count int64) (int64, error) {
 		return 0, ErrCountInvalid
 	}
 
-	if count > maxPopsAppendPerVisitor {
-		count = maxPopsAppendPerVisitor
+	if count > configMaxPopsAppendPerVisitor {
+		count = configMaxPopsAppendPerVisitor
 	}
 
 	return count, nil

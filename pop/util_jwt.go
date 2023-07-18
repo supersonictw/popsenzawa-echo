@@ -23,13 +23,16 @@ var (
 )
 
 var (
-	serverAddress      = viper.GetString("server.address")
-	popJwtSecretString = viper.GetString("jwt.secret")
-	popJwtSecretBytes  = []byte(popJwtSecretString)
+	configServerAddress      = viper.GetString("server.address")
+	configPopJwtSecretString = viper.GetString("jwt.secret")
 )
 
 var (
-	serverID = sha256.Sum256(append([]byte(serverAddress), popJwtSecretBytes...))
+	popJwtSecretBytes = []byte(configPopJwtSecretString)
+)
+
+var (
+	serverID = sha256.Sum256(append([]byte(configServerAddress), popJwtSecretBytes...))
 )
 
 func getJwtMetadataFromContext(c *gin.Context) (string, string, string, error) {

@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	serverAddress = viper.GetString("server.address")
+	configServerAddress = viper.GetString("server.address")
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	fmt.Println()
 
 	r := gin.Default()
-	if len(allowOrigins) > 0 {
+	if len(configAllowOrigins) > 0 {
 		cors := getCORS()
 		r.Use(cors)
 	}
@@ -55,7 +55,7 @@ func main() {
 	)
 
 	log.Println("echo-server startup successfully!")
-	if err := r.Run(serverAddress); err != nil {
+	if err := r.Run(configServerAddress); err != nil {
 		log.Fatal(err)
 	}
 }
