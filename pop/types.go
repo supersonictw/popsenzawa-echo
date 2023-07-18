@@ -4,5 +4,6 @@
 package pop
 
 type Response struct {
-	NewToken string `json:"new_token"`
+	CountAppend int64  `json:"count_append,omitempty"`
+	NewToken    string `json:"new_token"`
 }

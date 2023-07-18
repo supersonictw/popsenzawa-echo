@@ -27,6 +27,7 @@ func PostPops(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusAccepted, &Response{
-		NewToken: newToken,
+		CountAppend: pop.Count,
+		NewToken:    newToken,
 	})
 }
