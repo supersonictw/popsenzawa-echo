@@ -16,7 +16,6 @@ var (
 
 var (
 	uploader = NewUploader()
-	broker   = NewBroker()
 	ticker   = time.NewTicker(1 * time.Second)
 )
 
@@ -26,7 +25,6 @@ func init() {
 		time.Duration(configMessageQueuePollDuration)*time.Second,
 	)
 	MessageQueue.AddConsumer("uploader", uploader)
-	MessageQueue.AddConsumer("broker", broker)
 }
 
 func init() {

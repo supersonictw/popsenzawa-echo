@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	ConnectionName = "rmq"
-	QueueName      = ""
+	ConnectionName = "popsenzawa_echo"
+	QueueName      = "pop_queue"
 )
 
 var (

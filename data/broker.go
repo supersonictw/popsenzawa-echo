@@ -5,13 +5,11 @@ package data
 
 import (
 	"log"
-
-	"github.com/adjust/rmq/v5"
 )
 
-type Broker struct {
-	nextPop chan *BrokerNextPop
-}
+var (
+	nextPop = make(chan *BrokerNextPop, 1)
+)
 
 type BrokerInitPop struct {
 	GlobalSum int64            `json:"global_sum"`
@@ -21,33 +19,6 @@ type BrokerInitPop struct {
 type BrokerNextPop struct {
 	RegionCode  string `json:"region_code"`
 	CountAppend int64  `json:"count_append"`
-}
-
-func NewBroker() *Broker {
-	u := new(Broker)
-	u.nextPop = make(chan *BrokerNextPop, 1)
-	return u
-}
-
-func (b *Broker) Consume(delivery rmq.Delivery) {
-	pop := new(VisitorPop)
-
-	if err := pop.FromMessageQueue(delivery); err != nil {
-		log.Println(err)
-		if err := delivery.Reject(); err != nil {
-			log.Println(err)
-		}
-		return
-	}
-
-	b.nextPop <- &BrokerNextPop{
-		RegionCode:  pop.RegionCode,
-		CountAppend: pop.Count,
-	}
-
-	if err := delivery.Ack(); err != nil {
-		log.Println(err)
-	}
 }
 
 func fetchRegionSum() []*RegionPop {
@@ -91,7 +62,7 @@ func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
 }
 
 func BrokerOnUpdated(callback func(nextPop *BrokerNextPop)) {
-	for nextPop := range broker.nextPop {
+	for nextPop := range nextPop {
 		callback(nextPop)
 	}
 }
