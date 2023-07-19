@@ -5,18 +5,17 @@ address = "127.0.0.1:8000"
 allow_origins = ["http://localhost:5173"]
 
 [broker]
-next_pop_chan_length = 1000
 ping_duration = 5
 
-[loader]
+[upload]
 prefetch_limit = 1000
 poll_duration = 5
 wave_duration = 1
 
-[mysql]
-dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
+[gorm]
+mysql_dsn = "popsenzawa_echo:popsenzawa_echo@tcp(127.0.0.1:3306)/popsenzawa_echo"
 
-[geolite2]
+[ipgeo]
 database_path = "/tmp/ip_geo.mmdb"
 
 [redis]

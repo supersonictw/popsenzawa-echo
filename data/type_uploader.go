@@ -22,9 +22,10 @@ func NewUploader() *Uploader {
 }
 
 func (u *Uploader) Consume(delivery rmq.Delivery) {
-	pop := new(VisitorPop)
+	dataString := delivery.Payload()
 
-	if err := pop.FromMessageQueue(delivery); err != nil {
+	pop := new(VisitorPop)
+	if err := pop.FromString(dataString); err != nil {
 		log.Println(err)
 		if err := delivery.Reject(); err != nil {
 			log.Println(err)
@@ -52,7 +53,6 @@ func (u *Uploader) Wave() {
 func (u Uploader) perform() {
 	for _, pop := range u.visitorPopSum {
 		upload(pop)
-		broke(pop)
 	}
 }
 
@@ -74,7 +74,7 @@ func upload(newPop *VisitorPop) {
 
 func uploadVisitorPop(ipAddress VisitorIP, regionCode string, appendCount int64) {
 	pop := new(VisitorPop)
-	if tx := Database.First(
+	if tx := database.First(
 		pop,
 		"ip_address = ? AND region_code = ?",
 		ipAddress,
@@ -91,14 +91,14 @@ func uploadVisitorPop(ipAddress VisitorIP, regionCode string, appendCount int64)
 		pop.Count += appendCount
 	}
 
-	if tx := Database.Save(pop); tx.Error != nil {
+	if tx := database.Save(pop); tx.Error != nil {
 		log.Println(tx.Error)
 	}
 }
 
 func uploadRegionPop(regionCode string, appendCount int64) {
 	pop := new(RegionPop)
-	if tx := Database.First(
+	if tx := database.First(
 		pop,
 		"region_code = ?",
 		regionCode,
@@ -113,7 +113,7 @@ func uploadRegionPop(regionCode string, appendCount int64) {
 		pop.Count += appendCount
 	}
 
-	if tx := Database.Save(pop); tx.Error != nil {
+	if tx := database.Save(pop); tx.Error != nil {
 		log.Println(tx.Error)
 	}
 }

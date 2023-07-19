@@ -21,7 +21,7 @@ func (v VisitorIP) NetIP() net.IP {
 }
 
 func (v VisitorIP) RegionCode() (string, error) {
-	return FindRegionCodeByIPAddress(v.NetIP())
+	return findRegionCodeByIPAddress(v.NetIP())
 }
 
 func (v VisitorIP) String() string {

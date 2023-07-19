@@ -4,6 +4,7 @@
 package data
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -11,13 +12,12 @@ import (
 )
 
 var (
-	configBrokerNextPopChanLength = viper.GetInt("broker.next_pop_chan_length")
-	configBrokerPingDuration      = viper.GetFloat64("broker.ping_duration")
+	configBrokerPingDuration = viper.GetFloat64("broker.ping_duration")
 )
 
-var (
-	nextPop = make(chan *BrokerNextPop, configBrokerNextPopChanLength)
-)
+type Broker struct {
+	SessionID string
+}
 
 type BrokerInitPop struct {
 	GlobalSum int64            `json:"global_sum"`
@@ -29,17 +29,16 @@ type BrokerNextPop struct {
 	CountAppend int64  `json:"count_append"`
 }
 
-func broke(pop *VisitorPop) {
-	nextPop <- &BrokerNextPop{
-		RegionCode:  pop.RegionCode,
-		CountAppend: pop.Count,
-	}
+func NewBroker(sessionID string) *Broker {
+	b := new(Broker)
+	b.SessionID = sessionID
+	return b
 }
 
 func fetchRegionSum() []*RegionPop {
 	var regionSum []*RegionPop
 
-	if tx := Database.Find(&regionSum); tx.Error != nil {
+	if tx := database.Find(&regionSum); tx.Error != nil {
 		log.Panicln(tx.Error)
 	}
 
@@ -66,21 +65,28 @@ func regionSumToMap(regionSum []*RegionPop) map[string]int64 {
 	return regionMap
 }
 
-func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
+func (b *Broker) OnConnected(callback func(initPop *BrokerInitPop)) {
 	regionSum := fetchRegionSum()
 	globalSum := regionSumToGlobal(regionSum)
 	regionMap := regionSumToMap(regionSum)
+
 	callback(&BrokerInitPop{
 		GlobalSum: globalSum,
 		RegionMap: regionMap,
 	})
 }
 
-func BrokerOnActive(callback func(timestamp time.Time), done <-chan struct{}) {
-	ticker := time.NewTicker(time.Duration(configBrokerPingDuration) * time.Second)
-	for time := range ticker.C {
+func (b *Broker) OnActive(ctx context.Context, callback func(timestamp time.Time)) {
+	brokerTickerDuration := time.Duration(configBrokerPingDuration) * time.Second
+	brokerTicker := time.NewTicker(brokerTickerDuration)
+
+	defer func() {
+		brokerTicker.Stop()
+	}()
+
+	for time := range brokerTicker.C {
 		select {
-		case <-done:
+		case <-ctx.Done():
 			return
 		default:
 			callback(time)
@@ -88,13 +94,22 @@ func BrokerOnActive(callback func(timestamp time.Time), done <-chan struct{}) {
 	}
 }
 
-func BrokerOnUpdated(callback func(nextPop *BrokerNextPop), done <-chan struct{}) {
-	for pop := range nextPop {
+func (b *Broker) OnUpdated(ctx context.Context, callback func(nextPop *BrokerNextPop)) {
+	pubSub := redisClient.Subscribe(ctx, redisKey(redisKeyBroker))
+
+	for {
 		select {
-		case <-done:
+		case message := <-pubSub.Channel():
+			pubPop := new(VisitorPop)
+			if err := pubPop.FromString(message.Payload); err != nil {
+				log.Panicln(err)
+			}
+			callback(&BrokerNextPop{
+				RegionCode:  pubPop.RegionCode,
+				CountAppend: pubPop.Count,
+			})
+		case <-ctx.Done():
 			return
-		default:
-			callback(pop)
 		}
 	}
 }

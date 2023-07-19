@@ -4,9 +4,8 @@
 package data
 
 import (
+	"context"
 	"encoding/json"
-
-	"github.com/adjust/rmq/v5"
 )
 
 type VisitorPop struct {
@@ -21,12 +20,19 @@ func (v *VisitorPop) Publish() error {
 		return err
 	}
 
-	return MessageQueue.PublishBytes(jsonBytes)
+	if err := uploadQueue.PublishBytes(jsonBytes); err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+	if err := redisClient.Publish(ctx, redisKey(redisKeyBroker), jsonBytes).Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func (v *VisitorPop) FromMessageQueue(delivery rmq.Delivery) error {
-	dataString := delivery.Payload()
+func (v *VisitorPop) FromString(dataString string) error {
 	dataBytes := []byte(dataString)
-
 	return json.Unmarshal(dataBytes, v)
 }
