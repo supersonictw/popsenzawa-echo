@@ -29,6 +29,13 @@ type BrokerNextPop struct {
 	CountAppend int64  `json:"count_append"`
 }
 
+func broke(pop *VisitorPop) {
+	nextPop <- &BrokerNextPop{
+		RegionCode:  pop.RegionCode,
+		CountAppend: pop.Count,
+	}
+}
+
 func fetchRegionSum() []*RegionPop {
 	var regionSum []*RegionPop
 

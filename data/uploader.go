@@ -39,11 +39,6 @@ func (u *Uploader) Consume(delivery rmq.Delivery) {
 		u.visitorPopSum[ipAddressString].Count += pop.Count
 	}
 
-	nextPop <- &BrokerNextPop{
-		RegionCode:  pop.RegionCode,
-		CountAppend: pop.Count,
-	}
-
 	if err := delivery.Ack(); err != nil {
 		log.Println(err)
 	}
@@ -57,6 +52,7 @@ func (u *Uploader) Wave() {
 func (u Uploader) perform() {
 	for _, pop := range u.visitorPopSum {
 		upload(pop)
+		broke(pop)
 	}
 }
 
