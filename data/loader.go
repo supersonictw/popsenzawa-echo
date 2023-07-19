@@ -10,22 +10,22 @@ import (
 )
 
 var (
-	configMessageQueuePrefetchLimit = viper.GetInt64("message_queue.prefetcb_limit")
-	configMessageQueuePollDuration  = viper.GetFloat64("message_queue.poll_duration")
-	configMessageQueueWaveDuration  = viper.GetFloat64("message_queue.wave_duration")
+	configLoaderPrefetchLimit = viper.GetInt64("loader.prefetch_limit")
+	configLoaderPollDuration  = viper.GetFloat64("loader.poll_duration")
+	configLoaderWaveDuration  = viper.GetFloat64("loader.wave_duration")
 )
 
 var (
 	uploader = NewUploader()
 	ticker   = time.NewTicker(
-		time.Duration(configMessageQueueWaveDuration) * time.Second,
+		time.Duration(configLoaderWaveDuration) * time.Second,
 	)
 )
 
 func init() {
 	MessageQueue.StartConsuming(
-		configMessageQueuePrefetchLimit,
-		time.Duration(configMessageQueuePollDuration)*time.Second,
+		configLoaderPrefetchLimit,
+		time.Duration(configLoaderPollDuration)*time.Second,
 	)
 	MessageQueue.AddConsumer("uploader", uploader)
 }

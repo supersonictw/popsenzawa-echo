@@ -5,16 +5,17 @@ package leaderboard
 
 import (
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/supersonictw/popsenzawa-echo/data"
 )
 
 func GetLeaderboard(c *gin.Context) {
-	sendMessage := useSendMessage(c)
+	_, sendPing, sendMessage := useServerSideEvent(c)
 
 	data.BrokerOnConnected(func(initPop *data.BrokerInitPop) {
-		if err := sendMessage(&Message{
+		if _, err := sendMessage(&Message{
 			Type: MessageTypeInitPop,
 			Pops: initPop,
 		}); err != nil {
@@ -22,12 +23,20 @@ func GetLeaderboard(c *gin.Context) {
 		}
 	})
 
-	data.BrokerOnUpdated(func(nextPop *data.BrokerNextPop) {
-		if err := sendMessage(&Message{
+	go data.BrokerOnActive(func(t time.Time) {
+		if _, err := sendPing(t); err != nil {
+			log.Panicln(err)
+		}
+	}, c.Done())
+
+	go data.BrokerOnUpdated(func(nextPop *data.BrokerNextPop) {
+		if _, err := sendMessage(&Message{
 			Type: MessageTypeNextPop,
 			Pops: nextPop,
 		}); err != nil {
 			log.Panicln(err)
 		}
 	}, c.Done())
+
+	<-c.Done()
 }

@@ -5,10 +5,18 @@ package data
 
 import (
 	"log"
+	"time"
+
+	"github.com/spf13/viper"
 )
 
 var (
-	nextPop = make(chan *BrokerNextPop, configMessageQueuePrefetchLimit)
+	configBrokerNextPopChanLength = viper.GetInt("broker.next_pop_chan_length")
+	configBrokerPingDuration      = viper.GetFloat64("broker.ping_duration")
+)
+
+var (
+	nextPop = make(chan *BrokerNextPop, configBrokerNextPopChanLength)
 )
 
 type BrokerInitPop struct {
@@ -59,6 +67,18 @@ func BrokerOnConnected(callback func(initPop *BrokerInitPop)) {
 		GlobalSum: globalSum,
 		RegionMap: regionMap,
 	})
+}
+
+func BrokerOnActive(callback func(timestamp time.Time), done <-chan struct{}) {
+	ticker := time.NewTicker(time.Duration(configBrokerPingDuration) * time.Second)
+	for time := range ticker.C {
+		select {
+		case <-done:
+			return
+		default:
+			callback(time)
+		}
+	}
 }
 
 func BrokerOnUpdated(callback func(nextPop *BrokerNextPop), done <-chan struct{}) {
