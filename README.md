@@ -6,7 +6,7 @@ The server-side reproduction, similar the one of <https://popcat.click>, improve
 
 The docker image is available on:
 
-<https://hub.docker.com/r/supersonictw/popsenzawa-echo>
+<https://github.com/supersonictw/popsenzawa-echo/pkgs/container/popsenzawa-echo>
 
 ## Installation
 
