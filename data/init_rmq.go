@@ -14,7 +14,7 @@ const (
 )
 
 const (
-	rmqQueueNameUpload = "upload_queue"
+	rmqQueueNameUpload = "upload"
 )
 
 var (

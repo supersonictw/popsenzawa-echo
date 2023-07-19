@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	redisNamespace = "popsenzawa_rmq"
+	redisNamespace = "popsenzawa_redis"
 )
 
 const (
