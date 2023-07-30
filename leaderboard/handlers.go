@@ -4,7 +4,6 @@
 package leaderboard
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -13,13 +12,9 @@ import (
 )
 
 func GetLeaderboard(c *gin.Context) {
+	ctx := c.Request.Context()
 	sessionID, sendPing, sendMessage := useServerSideEvent(c)
 	broker := data.NewBroker(sessionID)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer func() {
-		cancel()
-	}()
 
 	broker.OnConnected(func(initPop *data.BrokerInitPop) {
 		if _, err := sendMessage(&Message{

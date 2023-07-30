@@ -14,7 +14,7 @@ type VisitorPop struct {
 	Count      int64     `json:"count" gorm:"not null"`
 }
 
-func (v *VisitorPop) Publish() error {
+func (v *VisitorPop) Publish(ctx context.Context) error {
 	jsonBytes, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -24,8 +24,11 @@ func (v *VisitorPop) Publish() error {
 		return err
 	}
 
-	ctx := context.Background()
-	if err := redisClient.Publish(ctx, redisKey(redisKeyBroker), jsonBytes).Err(); err != nil {
+	if err := redisClient.Publish(
+		ctx,
+		redisKey(redisKeyBroker),
+		jsonBytes,
+	).Err(); err != nil {
 		return err
 	}
 
