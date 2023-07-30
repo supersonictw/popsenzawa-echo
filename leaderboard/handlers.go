@@ -40,5 +40,5 @@ func GetLeaderboard(c *gin.Context) {
 		}
 	})
 
-	<-c.Request.Context().Done()
+	<-ctx.Done()
 }
