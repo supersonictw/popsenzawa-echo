@@ -1,31 +1,29 @@
 # PopSenzawa Echo
 
-The server-side reproduction, similar the one of <https://popcat.click>, improve the performance and speed.
+Welecome to use PopSenzawa Echo!
 
-## Docker Image
+This is the server-side reproduction,
+similar the one of [https://popcat.click](https://popcat.click),
+improve the performance and speed.
 
-The docker image is available on:
+The software provides the high-performance,
+high-reliability, and high-security,
+with GoLang, Redis, and MariaDB.
 
-<https://github.com/supersonictw/popsenzawa-echo/pkgs/container/popsenzawa-echo>
+It's licensed under the [MIT License](LICENSE).
 
-## Installation
+## How to use
 
-<https://github.com/supersonictw/popsenzawa-echo/issues/1>
+### Prerequisites
 
-<https://github.com/supersonictw/popsenzawa-echo_deploy>
+- Docker
+- Docker Compose
 
-## Web Client
+### Run
 
-<https://github.com/supersonictw/popsenzawa-active>
-
-## Click BOT Simulator
-
-<https://github.com/supersonictw/popsenzawa-delivery>
-
-## Documentation
-
-The documents are not ready yet, but will be prepared as soon as possible.
-
-## License
-
-[MIT License](LICENSE)
+```bash
+git clone https://github.com/supersonictw/popsenzawa-echo-deploy.git
+cd popsenzawa-echo-deploy
+sh initialize_mmdb.sh
+docker-compose up -d
+```
