@@ -1,6 +1,6 @@
 # PopSenzawa Echo
 
-Welecome to use PopSenzawa Echo!
+Welcome to use PopSenzawa Echo!
 
 This is the server-side reproduction,
 similar the one of [https://popcat.click](https://popcat.click),
