@@ -27,3 +27,5 @@ cd popsenzawa-echo-deploy
 sh initialize_mmdb.sh
 docker-compose up -d
 ```
+
+The server will start on <https://localhost:8000>.
